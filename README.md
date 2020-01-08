@@ -1,5 +1,5 @@
 # enrolled-students
-
+App per registrare e gestire gli studenti iscritti a un corso.
 ## Project setup
 ```
 npm install
