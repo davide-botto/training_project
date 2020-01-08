@@ -20,12 +20,12 @@
           <v-col align="center">{{student.Nome}}</v-col>
           
         </v-row>
-        <div id="handle-student">
+        <!-- Mostro i buttons di modifica e cancellazione solo se l'utente è admin -->
+        <div v-show="user.loggedIn && user.data.admin" id="handle-student">
           <Popup :student="student"/>
           <v-btn class="px-2 grey lighten-2" min-width="0" max-width="20px" max-height="20px" @click="removeStudent(student.id)">
             x
           </v-btn>
-          
         </div>
         <v-divider></v-divider>
       </v-card>
@@ -37,7 +37,7 @@
 // @ is an alias to /src
 import Popup from "../components/Popup";
 import TopBar from "../components/TopBar"
-
+import { mapGetters } from "vuex";
 import {db} from "@/fb";
 
 export default {
@@ -75,6 +75,13 @@ export default {
       this.showMenu = true;
     }
   },
+  computed: {
+    ...mapGetters({
+      // map `this.user` to `this.$store.getters.user`
+      user: "user"
+    })
+  },
+
   created() {
     db.collection("students").onSnapshot(res => {
       const changes = res.docChanges();

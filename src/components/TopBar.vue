@@ -9,8 +9,8 @@
       <v-icon>mdi-home</v-icon>
     </v-btn>
     <v-spacer></v-spacer>
-    <Popup v-if="properties.students" />
-    <!-- <v-btn v-if="properties.exit" outlined @click="logout">Esci</v-btn> -->
+    <Popup v-if="properties.students && user.loggedIn && user.data.admin" />
+    
     <Account v-if="properties.exit" />
   </v-app-bar>
   
@@ -20,6 +20,7 @@
 <script>
 import Popup from "../components/Popup";
 import Account from "../components/Account";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -33,7 +34,13 @@ export default {
       infoLogout: false
     };
   },
-  
+  computed: {
+    ...mapGetters({
+      // map `this.user` to `this.$store.getters.user`
+      user: "user"
+    })
+  },
+
   components: {
     Popup,
     Account
