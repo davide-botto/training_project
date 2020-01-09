@@ -10,7 +10,10 @@
         <v-list-item @click.stop="outputDialog = true">Account</v-list-item>
 
         <!-- Rendo visibile questa voce solo se l'utente è admin -->
-        <v-list-item v-if="user.loggedIn && user.data.admin" @click="inputDialog = true">Crea nuovo admin</v-list-item>
+        <v-list-item
+          v-if="user.loggedIn && user.data.admin"
+          @click="inputDialog = true"
+        >Crea nuovo admin</v-list-item>
 
         <v-list-item @click="logout">Esci</v-list-item>
       </v-list>
@@ -21,11 +24,10 @@
       <v-card v-if="user.loggedIn">
         <v-card-title>
           <h3>Informazioni account</h3>
-          <v-card-text>Utente logged in come {{user.data.email}}
-            <div v-show="user.data.admin" align="center">Admin</div>
-
+          <v-card-text>
+            Utente logged in come {{user.data.email}}
+            <div v-if="user.data.admin" align="center">Admin</div>
           </v-card-text>
-
         </v-card-title>
       </v-card>
     </v-dialog>
@@ -53,7 +55,6 @@
 <script>
 import { auth } from "@/fb";
 import { mapGetters } from "vuex";
-import { bus } from "@/main";
 import { functions } from "@/fb";
 
 export default {
@@ -68,21 +69,21 @@ export default {
   methods: {
     logout() {
       auth.signOut().then(() => {
-        bus.$emit("session-ended");
         this.$router.replace({ name: "login" });
       });
     },
     newAdmin() {
       // Chiamo la cloud function
       const addAdminRole = functions.httpsCallable("addAdminRole");
-      addAdminRole({ email: this.adminEmail }).then(result => {
-        console.log(result);
-        this.inputDialog = false;
-        this.$refs.form.reset();
-
-      }).catch(err => {
-        this.error = err.message;
-      });
+      addAdminRole({ email: this.adminEmail })
+        .then(result => {
+          console.log(result);
+          this.inputDialog = false;
+          this.$refs.form.reset();
+        })
+        .catch(err => {
+          this.error = err.message;
+        });
     }
   },
   computed: {

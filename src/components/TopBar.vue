@@ -9,7 +9,10 @@
       <v-icon>mdi-home</v-icon>
     </v-btn>
     <v-spacer></v-spacer>
-    <Popup v-if="properties.students && user.loggedIn && user.data.admin" />
+
+    <template v-if="properties.students">
+    <Popup v-if="user.loggedIn && user.data.admin" />
+    </template>
     
     <Account v-if="properties.exit" />
   </v-app-bar>

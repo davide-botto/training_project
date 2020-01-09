@@ -28,7 +28,7 @@
 <script>
 import {db} from "@/fb";
 
-let pattern = /^[a-z]+$/i;
+let pattern = /^[a-zì'àè]+$/i;
 export default {
   props: {
     student: {

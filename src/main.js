@@ -18,12 +18,11 @@ auth.onAuthStateChanged(user => {
 
     });
   } else {
-    store.dispatch("fetchUser", user);
+      store.dispatch("fetchUser", user);
   }
 
 });
 
-export const bus = new Vue();
 
 new Vue({
   router,
