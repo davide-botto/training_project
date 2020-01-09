@@ -6,6 +6,7 @@ export default new Vuex.Store({
     state: {
         user: {
             loggedIn: false,
+            message: false,
             data: null
         }
     },
@@ -21,7 +22,9 @@ export default new Vuex.Store({
         SET_USER(state, data) {
             state.user.data = data;
         },
-        
+        SET_MESSAGE(state,value) {
+            state.user.message = value
+        }
     },
     actions: {
         fetchUser({commit}, user) {
@@ -34,6 +37,10 @@ export default new Vuex.Store({
             } else {
                 commit("SET_USER", null);
             }
+        },
+
+        triggerMessage({commit}, value) {
+            commit("SET_MESSAGE",value);
         }
     }
 });

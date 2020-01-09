@@ -12,7 +12,7 @@
             Una password valida deve contenere almeno 8 simboli, tra cui:
             <ul>
               <li>almeno una lettera maiuscola e una minuscola,</li>
-              <li>almeno un numero e almeno un carattere speciale (! @ # $ % ^ &).</li>
+              <li>almeno un numero e almeno un carattere speciale.</li>
             </ul>
           </div>
 
@@ -65,10 +65,10 @@ export default {
          * almeno una lettera minuscola
          * almeno una lettera maiuscola
          * almeno un numero
-         * almeno un carattere speciale (! @ # $ % ^ &)
+         * almeno un carattere speciale
          */
         content: v =>
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.{8,})/.test(v) ||
+          /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)(?=.*[^ ]).*$/.test(v) ||
           "Invalid password"
       }
     };

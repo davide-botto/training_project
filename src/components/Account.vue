@@ -56,6 +56,7 @@
 import { auth } from "@/fb";
 import { mapGetters } from "vuex";
 import { functions } from "@/fb";
+import store from "../store/";
 
 export default {
   data() {
@@ -69,6 +70,7 @@ export default {
   methods: {
     logout() {
       auth.signOut().then(() => {
+        store.dispatch("triggerMessage", true);
         this.$router.replace({ name: "login" });
       });
     },

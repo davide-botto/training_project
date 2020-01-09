@@ -3,12 +3,12 @@
   <v-app id="inspire">
     <TopBar :properties="properties" />
     <v-content>
-      <div align="center">Utente logged out {{ infoLogout }}</div>
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center" no-gutters>
           <v-col cols="12" sm="8" md="4">
             <v-row align="center" justify="center">
               <v-card class="elevation'12">
+                <div align="center" z-index="2" v-show="user.message">Arrivederci, sei stato logged out</div>
                 <v-card-title>
                   <h2>Accedi</h2>
                   <v-card-text>
@@ -42,6 +42,8 @@
 import { auth } from "@/fb";
 import SignUp from "../components/SignUp";
 import TopBar from "../components/TopBar";
+import store from "../store/";
+import { mapGetters } from "vuex";
 
 export default {
   data() {
@@ -63,15 +65,20 @@ export default {
       auth
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
+          store.dispatch("triggerMessage", false);
           this.$router.replace({ name: "home" });
         })
         .catch(err => {
           this.error = err.message;
         });
-    },
-        
+    }
   },
-  
+  computed: {
+    ...mapGetters({
+      // map `this.user` to `this.$store.getters.user`
+      user: "user"
+    })
+  },
   components: {
     TopBar,
     SignUp
