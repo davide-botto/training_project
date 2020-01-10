@@ -9,20 +9,27 @@ Vue.config.productionTip = false
 
 auth.onAuthStateChanged(user => {
   if (user) {
-    // Se l'utente è logged-in, accedo ai custom claims
-    user.getIdTokenResult().then(idTokenResult => {
-      // Aggiungo la proprietà admin a user
-      user.admin = idTokenResult.claims.admin;
-      // Dispatch della action "fetchUser"
-      store.dispatch("fetchUser", user);
+    // Dispatch della action "fetchUser"
+    if (user.emailVerified) {
+      console.log("Login Success");
+      // Se l'utente è logged-in, accedo ai custom claims
+      user.getIdTokenResult().then(idTokenResult => {
+        // Aggiungo la proprietà admin a user
+        user.admin = idTokenResult.claims.admin;
+        // Dispatch della action "fetchUser"
+        store.dispatch("fetchUser", user);
 
-    });
+      });
+    } else {
+      console.log("Email not verified");
+      store.dispatch("fetchUser", user);
+    }
+
   } else {
-      store.dispatch("fetchUser", user);
+    console.log("Not logged in");
+
   }
-
 });
-
 
 new Vue({
   router,

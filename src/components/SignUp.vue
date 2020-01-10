@@ -1,7 +1,7 @@
 <template>
   <v-dialog max-width="600px" v-model="dialog">
     <template v-slot:activator="{on}">
-      <v-btn outlined color="blue" v-on="on">Registrati</v-btn>
+      <v-btn outlined class="mr-4" color="blue" v-on="on">Registrati</v-btn>
     </template>
     <v-card>
       <v-card-title>
@@ -16,11 +16,11 @@
             </ul>
           </div>
 
-          <v-form ref="form">
+          <v-form ref="form" @submit.prevent="signUp" id="signupForm">
             <v-text-field
               v-model="email"
               placeholder="Email"
-              :rules="[rules.required]"
+              :rules="[rules.required, rules.emailFormat]"
               prepend-icon="mdi-account"
             ></v-text-field>
             <v-text-field
@@ -38,7 +38,7 @@
               type="password"
               prepend-icon="mdi-lock"
             ></v-text-field>
-            <v-btn class="mr-4" color="blue" dark @click="submit">Invia</v-btn>
+            <v-btn class="mr-4" color="blue" dark type="submit" form="signupForm">Invia</v-btn>
           </v-form>
         </v-card-text>
       </v-card-title>
@@ -59,7 +59,11 @@ export default {
       re_password: "",
       error: null,
       rules: {
-        required: value => !!value || "Required",
+        emailFormat: v =>
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
+            v
+          ) || "Format email non valido",
+        required: value => !!value || "Campo necessario",
         /**Regole Password:
          * almeno 8 simboli
          * almeno una lettera minuscola
@@ -68,26 +72,43 @@ export default {
          * almeno un carattere speciale
          */
         content: v =>
-          /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)(?=.*[^ ]).*$/.test(v) ||
-          "Invalid password"
+          /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)(?=.*[^ ]).*$/.test(
+            v
+          ) || "Formato password non valido"
       }
     };
   },
   methods: {
-    submit() {
-      auth
-        .createUserWithEmailAndPassword(this.email, this.password)
-        .then(() => {
-          (this.dialog = false), this.$refs.form.reset(), (this.error = null);
-        })
-        .catch(err => {
-          this.error = err.message;
-        });
+    signUp() {
+      auth.languageCode = 'it';
+      const promise = auth.createUserWithEmailAndPassword(
+        this.email,
+        this.password
+      );
+      promise.then(() => {
+        this.dialog = false;
+        this.$refs.form.reset();
+        this.error = null;
+      });
+      promise.catch(err => (this.error = err.message));
+      // verifico l'email dell'utente
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          user
+            .sendEmailVerification()
+            .then(() => {
+              console.log("Email verification");
+              alert("Controlla la tua casella di posta. Abbiamo inviato un link di verifica all'indirizzo specificato");
+              });
+        } else {
+          console.log("Not logged in");
+        }
+      });
     }
   },
   computed: {
     passwordConfirmationRule() {
-      return this.password === this.re_password || "Passwords do not match";
+      return this.password === this.re_password || "Le password non coincidono";
     }
   }
 };

@@ -8,12 +8,16 @@
           <v-col cols="12" sm="8" md="4">
             <v-row align="center" justify="center">
               <v-card class="elevation'12">
-                <div align="center" z-index="2" v-show="user.message">Arrivederci, sei stato logged out</div>
+                <div
+                  align="center"
+                  z-index="2"
+                  v-if="user.message"
+                >Arrivederci, sei stato logged out</div>
                 <v-card-title>
                   <h2>Accedi</h2>
                   <v-card-text>
                     <div v-show="error" class="red--text">{{ error }}</div>
-                    <v-form ref="form">
+                    <v-form ref="form" @submit.prevent="login" id="login-form">
                       <v-text-field v-model="email" placeholder="Email" prepend-icon="mdi-account"></v-text-field>
                       <v-text-field
                         v-model="password"
@@ -24,8 +28,9 @@
                     </v-form>
                   </v-card-text>
                   <v-card-actions>
-                    <v-btn class="mr-4" color="blue" dark @click="login">LOGIN</v-btn>
+                    <v-btn class="mr-4" color="blue" dark form="login-form" type="submit">LOGIN</v-btn>
                     <SignUp />
+                    <v-btn @click="inputDialog = true ">Password dimenticata?</v-btn>
                   </v-card-actions>
                 </v-card-title>
               </v-card>
@@ -34,6 +39,25 @@
         </v-row>
       </v-container>
     </v-content>
+
+    <v-dialog v-model="inputDialog" max-width="400px">
+  
+      <v-card>
+        <v-card-title>
+          <h3>Reset password</h3>
+          <div v-show="error" class="red--text">{{ error }}</div>
+          <v-card-text>
+            <p>Inserisci il tuo indirizzo email</p>
+            <v-form ref="form">
+              <v-text-field v-model="email" placeholder="Email"></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn class="success" dark @click="resetPassword">Invia</v-btn>
+          </v-card-actions>
+        </v-card-title>
+      </v-card>
+    </v-dialog>
   </v-app>
   <!-- </div> -->
 </template>
@@ -54,23 +78,39 @@ export default {
         students: false,
         exit: false
       },
-      infoLogout: false,
       email: "",
       password: "",
-      error: null
+      error: null,
+      inputDialog: false
     };
   },
   methods: {
     login() {
+      store.dispatch("triggerMessage", false);
+
+      auth.signInWithEmailAndPassword(this.email, this.password).then(() => {
+        console.log(this.user.emailVerified)
+        if(this.user.emailVerified) {
+        // Se l'email è verificata, indirizzo l'utente alla home page
+        this.$router.replace({ name: "home" }).catch(err => err.message);
+        } else {
+          this.error = "L'email inserita non è verificata";
+        }
+      }).catch(err => (this.error = err.message))
+           
+    },
+    resetPassword() {
+      auth.languageCode = "it";
       auth
-        .signInWithEmailAndPassword(this.email, this.password)
+        .sendPasswordResetEmail(this.email)
         .then(() => {
-          store.dispatch("triggerMessage", false);
-          this.$router.replace({ name: "home" });
+          alert(
+            "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato"
+          );
+          this.inputDialog = false;
+          this.$refs.form.reset();
         })
-        .catch(err => {
-          this.error = err.message;
-        });
+        .catch(err => (this.error = err.message));
     }
   },
   computed: {
