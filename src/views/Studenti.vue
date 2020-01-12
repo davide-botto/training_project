@@ -1,6 +1,6 @@
 <template>
   <div class="studenti">
-    <TopBar :properties="properties"/>
+    <TopBar />
     <v-container>
       <v-row class="pa-2">
        <v-col align="center">
@@ -36,7 +36,8 @@
 <script>
 // @ is an alias to /src
 import Popup from "../components/Popup";
-import TopBar from "../components/TopBar"
+import TopBar from "../components/TopBar";
+import store from "@/store/";
 import { mapGetters } from "vuex";
 import {db} from "@/fb";
 
@@ -44,13 +45,7 @@ export default {
   name: "home",
   data() {
     return {
-      properties: {
-        courseTitle: false,
-        coursePage: false,
-        students: true,
-        home: true,
-        exit: true
-      },
+      
       students: [],
       showMenu: false
     };
@@ -75,10 +70,13 @@ export default {
       this.showMenu = true;
     }
   },
+
+  
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
-      user: "authentication/user"
+      user: "authentication/user",
+      barprop: "topbar/barprop"
     })
   },
 
@@ -99,6 +97,12 @@ export default {
         }
       });
     }, (err) => console.log(err.message));
+
+    store.dispatch("topbar/toggleTitle", false);
+    store.dispatch("topbar/togglePage", false);
+    store.dispatch("topbar/toggleStudents", true);
+    store.dispatch("topbar/toggleHome", true);
+    store.dispatch("topbar/toggleExit", true);
   },
 
   components: {

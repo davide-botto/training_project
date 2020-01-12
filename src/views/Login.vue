@@ -1,7 +1,7 @@
 <template>
   <!-- <div class="login" ref="div"> -->
   <v-app id="inspire">
-    <TopBar :properties="properties" />
+    <TopBar />
     <v-content>
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center" no-gutters>
@@ -87,12 +87,6 @@ import { mapGetters } from "vuex";
 export default {
   data() {
     return {
-      properties: {
-        courseTitle: true,
-        coursePage: false,
-        students: false,
-        exit: false
-      },
       email: "",
       password: "",
       error: null,
@@ -134,10 +128,21 @@ export default {
         .catch(err => (this.error = err.message));
     }
   },
+  created() {
+    
+      store.dispatch('topbar/toggleTitle',true);
+      store.dispatch('topbar/togglePage',false);
+      store.dispatch('topbar/toggleStudents',false);
+      store.dispatch('topbar/toggleHome',false);
+      store.dispatch('topbar/toggleExit', false);
+      
+    
+  },
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
-      user: "authentication/user"
+      user: "authentication/user",
+      barprop: "topbar/barprop"
     })
   },
   components: {

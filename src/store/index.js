@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 Vue.use(Vuex);
 
+// Gestisce le proprietà della sessione utente
 const authentication = {
     namespaced: true,
     state: {
@@ -27,12 +28,12 @@ const authentication = {
         SET_USER(state, data) {
             state.user.data = data;
         },
-        SET_MESSAGE(state,value) {
+        SET_MESSAGE(state, value) {
             state.user.message = value
         }
     },
     actions: {
-        fetchUser({commit}, user) {
+        fetchUser({ commit }, user) {
             commit("SET_LOGGED_IN", user !== null);
             commit("SET_ADMIN", user.admin == true);
             if (user) {
@@ -46,15 +47,72 @@ const authentication = {
             }
         },
 
-        triggerMessage({commit}, value) {
-            commit("SET_MESSAGE",value);
+        triggerMessage({ commit }, value) {
+            commit("SET_MESSAGE", value);
         }
     }
 }
 
+// Gestisce le proprietà della barra in alto presente in tutte le pagine
+const topbar = {
+    namespaced: true,
+    state: {
+        barprop: {
+            courseTitle: false,
+            coursePage: false,
+            students: false,
+            home: false,
+            exit: false
+        }
+    },
+    getters: {
+        barprop(state) {
+            return state.barprop
+        }
+    },
+    mutations: {
+        SET_TITLE(state, value) {
+            state.barprop.courseTitle = value
+        },
+        SET_PAGE(state, value) {
+            state.barprop.coursePage = value
+        },
+        SET_STUDENTS(state, value) {
+            state.barprop.students = value
+        },
+        SET_HOME(state, value) {
+            state.barprop.home = value
+        },
+        SET_EXIT(state, value) {
+            state.barprop.exit = value
+        }
+
+    },
+    actions: {
+        toggleTitle({ commit },value) {
+            commit('SET_TITLE', value);
+        },
+        togglePage({ commit }, value) {
+            commit('SET_PAGE', value);
+        },
+        toggleStudents({ commit }, value) {
+            commit('SET_STUDENTS', value);
+        },
+        toggleHome({ commit },value) {
+            commit('SET_HOME', value);
+        },
+        toggleExit({ commit },value) {
+            commit('SET_EXIT', value);
+        }
+    }
+}
+
+
+
 export default new Vuex.Store({
     modules: {
-        authentication
+        authentication,
+        topbar
     }
 });
 

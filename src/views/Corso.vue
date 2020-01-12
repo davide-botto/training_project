@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <TopBar :properties="properties" />
-        
+    <TopBar />
+
     <v-container>
       <v-row justify="center" no-gutters>
         <v-col cols="12" md="8">
@@ -10,7 +10,7 @@
           </v-card>
         </v-col>
       </v-row>
-      <v-row justify="center" >
+      <v-row justify="center">
         <v-col cols="6" md="4">
           <v-card>
             <v-card-text>Studenti iscritti</v-card-text>
@@ -28,24 +28,27 @@
 <script>
 import TopBar from "../components/TopBar";
 import { mapGetters } from "vuex";
+import store from "@/store/";
+
 export default {
   data() {
-    return {
-      properties: {
-        courseTitle: true,
-        coursePage: false,
-        students: false,
-        home: true,
-        exit: true
-      }
-    };
+    return {};
   },
+  created() {
+    store.dispatch("topbar/toggleTitle", false);
+    store.dispatch("topbar/togglePage", true);
+    store.dispatch("topbar/toggleStudents", false);
+    store.dispatch("topbar/toggleHome", true);
+    store.dispatch("topbar/toggleExit", true);
+  },
+
   components: {
     TopBar
   },
   computed: {
     ...mapGetters({
-      user: "authentication/user"
+      user: "authentication/user",
+      barprop: "topbar/barprop"
     })
   }
 };

@@ -11,14 +11,19 @@ auth.languageCode = 'it';
 
 auth.onAuthStateChanged(user => {
   if (user) {
-    console.log(user.emailVerified);
+
     if (user.emailVerified) {
       // Se l'email è verificata, controllo la presenza di custom claims
       user.getIdTokenResult().then(IdTokenResult => {
-        user.admin = IdTokenResult.claims.admin
+        user.admin = IdTokenResult.claims.admin;
+        // Scrivo i dati utente su store
+        store.dispatch("authentication/fetchUser", user);
+        if (router.currentRoute.name != "home") {
+          router.replace({ name: "home" }).catch(err => console.log(err.message));
+        }
       });
-      store.dispatch("authentication/fetchUser", user);
-      router.replace({name: "home"}).catch(err => console.log(err.message));
+
+
     } else {
       // Se l'email non è verificata, invio un link di verifica
       user
