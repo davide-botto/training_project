@@ -2,11 +2,12 @@ import Vue from "vue";
 import Vuex from "vuex";
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const authentication = {
+    namespaced: true,
     state: {
         user: {
             loggedIn: false,
-            emailVerified:false,
+            isAdmin: false,
             message: false,
             data: null
         }
@@ -20,11 +21,9 @@ export default new Vuex.Store({
         SET_LOGGED_IN(state, value) {
             state.user.loggedIn = value;
         },
-
-        SET_EMAIL_VER(state, value) {
-            state.user.emailVerified = value;
+        SET_ADMIN(state, value) {
+            state.user.isAdmin = value;
         },
-
         SET_USER(state, data) {
             state.user.data = data;
         },
@@ -35,11 +34,12 @@ export default new Vuex.Store({
     actions: {
         fetchUser({commit}, user) {
             commit("SET_LOGGED_IN", user !== null);
-            commit("SET_EMAIL_VER", user !== null);
+            commit("SET_ADMIN", user.admin == true);
             if (user) {
                 commit("SET_USER", {
                     email: user.email,
-                    admin: user.admin
+                    admin: user.admin,
+                    emailVerified: user.emailVerified
                 });
             } else {
                 commit("SET_USER", null);
@@ -49,6 +49,12 @@ export default new Vuex.Store({
         triggerMessage({commit}, value) {
             commit("SET_MESSAGE",value);
         }
+    }
+}
+
+export default new Vuex.Store({
+    modules: {
+        authentication
     }
 });
 

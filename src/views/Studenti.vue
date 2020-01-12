@@ -21,7 +21,7 @@
           
         </v-row>
         <!-- Mostro i buttons di modifica e cancellazione solo se l'utente è admin -->
-        <div v-show="user.loggedIn && user.data.admin" id="handle-student">
+        <div v-show="user.loggedIn && user.isAdmin" id="handle-student">
           <Popup :student="student"/>
           <v-btn class="px-2 grey lighten-2" min-width="0" max-width="20px" max-height="20px" @click="removeStudent(student.id)">
             x
@@ -78,7 +78,7 @@ export default {
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
-      user: "user"
+      user: "authentication/user"
     })
   },
 

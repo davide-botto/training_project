@@ -11,7 +11,7 @@
 
         <!-- Rendo visibile questa voce solo se l'utente è admin -->
         <v-list-item
-          v-if="user.loggedIn && user.data.admin"
+          v-show="user.loggedIn && user.isAdmin"
           @click="inputDialog=true"
         >
         Nuovo admin
@@ -26,9 +26,9 @@
       <v-card v-show="user.loggedIn">
         <v-card-title>
           <h3>Informazioni account</h3>
-          <v-card-text>
+          <v-card-text v-if="user.loggedIn">
             Utente logged in come {{user.data.email}}
-            <div v-show="user.loggedIn && user.data.admin" align="center">Admin</div>
+            <div v-show="user.loggedIn && user.isAdmin" align="center">Admin</div>
           </v-card-text>
         </v-card-title>
       </v-card>
@@ -37,7 +37,7 @@
     <!-- Dialog di inserimento email utente da rendere admin -->
     
     <v-dialog v-model="inputDialog" max-width="400px">
-      <v-card v-if="user.loggedIn && user.data.admin">
+      <v-card>
         <v-card-title>
           <h3>Rendi un utente amministratore</h3>
           <div v-show="error" class="red--text">{{ error }}</div>
@@ -74,7 +74,7 @@ export default {
   methods: {
     logout() {
       auth.signOut().then(() => {
-        store.dispatch("triggerMessage", true);
+        store.dispatch("authentication/triggerMessage", true);
         this.$router.replace({ name: "login" });
       });
     },
@@ -96,7 +96,7 @@ export default {
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
-      user: "user"
+      user: "authentication/user"
     })
   },
   

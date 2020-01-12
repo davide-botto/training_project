@@ -11,7 +11,7 @@
     <v-spacer></v-spacer>
 
     <template v-if="properties.students">
-    <Popup v-if="user.loggedIn && user.data.admin" />
+    <Popup v-if="user.loggedIn && user.isAdmin" />
     </template>
     
     <Account v-if="properties.exit" />
@@ -40,7 +40,7 @@ export default {
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
-      user: "user"
+      user: "authentication/user"
     })
   },
 

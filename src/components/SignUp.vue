@@ -1,7 +1,7 @@
 <template>
   <v-dialog max-width="600px" v-model="dialog">
     <template v-slot:activator="{on}">
-      <v-btn outlined class="mr-4" color="blue" v-on="on">Registrati</v-btn>
+      <v-btn outlined block color="blue" v-on="on">Registrati</v-btn>
     </template>
     <v-card>
       <v-card-title>
@@ -62,7 +62,7 @@ export default {
         emailFormat: v =>
           /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
             v
-          ) || "Format email non valido",
+          ) || "Formato email non valido",
         required: value => !!value || "Campo necessario",
         /**Regole Password:
          * almeno 8 simboli
@@ -80,7 +80,6 @@ export default {
   },
   methods: {
     signUp() {
-      auth.languageCode = 'it';
       const promise = auth.createUserWithEmailAndPassword(
         this.email,
         this.password
@@ -92,7 +91,7 @@ export default {
       });
       promise.catch(err => (this.error = err.message));
       // verifico l'email dell'utente
-      auth.onAuthStateChanged(user => {
+      /*auth.onAuthStateChanged(user => {
         if (user) {
           user
             .sendEmailVerification()
@@ -103,7 +102,7 @@ export default {
         } else {
           console.log("Not logged in");
         }
-      });
+      });*/
     }
   },
   computed: {

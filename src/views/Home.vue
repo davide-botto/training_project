@@ -9,28 +9,24 @@
         <span>Studenti iscritti</span>
       </v-btn>
     </v-bottom-navigation>
-    <!-- <div v-show="user" class="success--text" align="center">Utente connesso alla sessione</div> -->
-    <v-container>
-      <v-row align="center" no-gutters>
-        <v-col cols="12" md="8">
-          <v-card>
-            <v-card-title>Informazioni</v-card-title>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="6" md="4">
-          <v-card>
-            <v-card-text>Studenti iscritti</v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="6" md="4">
-          <v-card>
-            <v-card-text>Numero</v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+    <div class="success--text" align="center">{{user}}</div>
+
+    <!-- Form di iscrizione -->
+    <v-row justify="center">
+      <v-col cols="12">
+      <div>Iscriviti</div>
+      <v-form>
+        <v-text-field label="Nome" v-model="student.name"></v-text-field>
+        <v-text-field label="Cognome" v-model="student.surname"></v-text-field>
+        <v-menu v-model="dateMenu" min-width="290px">
+          <template v-slot:activator="{on}">
+            <v-text-field label="Data di nascita" v-model="student.date" prepend-icon="mdi-calendar" v-on="on"></v-text-field>        
+          </template>
+          <v-date-picker v-model="student.date" @input="dateMenu=false"></v-date-picker>
+        </v-menu>
+      </v-form>
+      </v-col>
+    </v-row>
   </div>
 </template>
 <script>
@@ -45,7 +41,13 @@ export default {
         students: false,
         home: false,
         exit: true
-      }
+      },
+      student: {
+        name: "",
+        surname: "",
+        date: new Date().toISOString().substr(0, 10)
+      },
+      dateMenu: false
     };
   },
   components: {
@@ -53,7 +55,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "user"
+      user: "authentication/user"
     })
   }
 };

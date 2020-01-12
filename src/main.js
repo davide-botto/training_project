@@ -6,30 +6,34 @@ import store from "./store/";
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false
+auth.languageCode = 'it';
+
 
 auth.onAuthStateChanged(user => {
   if (user) {
-    // Dispatch della action "fetchUser"
+    console.log(user.emailVerified);
     if (user.emailVerified) {
-      console.log("Login Success");
-      // Se l'utente è logged-in, accedo ai custom claims
-      user.getIdTokenResult().then(idTokenResult => {
-        // Aggiungo la proprietà admin a user
-        user.admin = idTokenResult.claims.admin;
-        // Dispatch della action "fetchUser"
-        store.dispatch("fetchUser", user);
-
+      // Se l'email è verificata, controllo la presenza di custom claims
+      user.getIdTokenResult().then(IdTokenResult => {
+        user.admin = IdTokenResult.claims.admin
       });
+      store.dispatch("authentication/fetchUser", user);
+      router.replace({name: "home"}).catch(err => console.log(err.message));
     } else {
-      console.log("Email not verified");
-      store.dispatch("fetchUser", user);
+      // Se l'email non è verificata, invio un link di verifica
+      user
+        .sendEmailVerification()
+        .then(() => {
+          console.log("Email verification");
+          alert("Controlla la tua casella di posta. Abbiamo inviato un link di verifica all'indirizzo specificato");
+        });
     }
-
-  } else {
-    console.log("Not logged in");
-
   }
+
 });
+
+
+
 
 new Vue({
   router,
