@@ -5,8 +5,11 @@
       <v-btn router to="/corso">
         <span>Pagina del corso</span>
       </v-btn>
-      <v-btn router to="/studenti">
+      <v-btn v-show="user.isAdmin" router to="/studenti">
         <span>Studenti iscritti</span>
+      </v-btn>
+      <v-btn v-show="!user.isAdmin" router to="/profiloStudente">
+        <span>Profilo studente</span>
       </v-btn>
     </v-bottom-navigation>
     <div class="success--text" align="center">{{user}}</div>
@@ -17,28 +20,28 @@
         <v-card>
           <v-card-title>
             <v-toolbar color="blue lighten-1" dark flat>
-            <h2>Iscriviti al corso</h2>
+              <h2>Iscriviti al corso</h2>
             </v-toolbar>
-          <v-card-text>
-            <v-form>
-              <v-text-field label="Nome" v-model="student.name"></v-text-field>
-              <v-text-field label="Cognome" v-model="student.surname"></v-text-field>
-              <v-menu v-model="dateMenu" min-width="290px">
-                <template v-slot:activator="{on}">
-                  <v-text-field
-                    label="Data di nascita"
-                    v-model="formatDate"
-                    prepend-icon="mdi-calendar"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker v-model="student.date" @input="dateMenu=false"></v-date-picker>
-              </v-menu>
-            </v-form>
-            <v-card-actions>
-              <v-btn>Invia</v-btn>
-            </v-card-actions>
-          </v-card-text>
+            <v-card-text>
+              <v-form>
+                <v-text-field label="Nome" v-model="student.name"></v-text-field>
+                <v-text-field label="Cognome" v-model="student.surname"></v-text-field>
+                <v-menu v-model="dateMenu" min-width="290px">
+                  <template v-slot:activator="{on}">
+                    <v-text-field
+                      label="Data di nascita"
+                      v-model="formatDate"
+                      prepend-icon="mdi-calendar"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="student.date" @input="dateMenu=false"></v-date-picker>
+                </v-menu>
+              </v-form>
+              <v-card-actions>
+                <v-btn @click="enrollStudent">Invia</v-btn>
+              </v-card-actions>
+            </v-card-text>
           </v-card-title>
         </v-card>
       </v-col>
@@ -61,11 +64,20 @@ export default {
     };
   },
   created() {
-    store.dispatch("topbar/toggleTitle", true);
-    store.dispatch("topbar/togglePage", false);
-    store.dispatch("topbar/toggleStudents", false);
-    store.dispatch("topbar/toggleHome", false);
-    store.dispatch("topbar/toggleExit", true);
+    store
+      .dispatch("topbar/toggleTitle", true)
+      .then(() => {
+        store.dispatch("topbar/togglePage", false);
+      })
+      .then(() => {
+        store.dispatch("topbar/toggleStudents", false);
+      })
+      .then(() => {
+        store.dispatch("topbar/toggleHome", false);
+      })
+      .then(() => {
+        store.dispatch("topbar/toggleExit", true);
+      });
   },
   components: {
     TopBar
@@ -76,8 +88,13 @@ export default {
       barprop: "topbar/barprop"
     }),
     formatDate() {
-      let arr = this.student.date.split('-');
-      return arr[2] + '-' + arr[1] + '-' + arr[0];
+      let arr = this.student.date.split("-");
+      return arr[2] + "-" + arr[1] + "-" + arr[0];
+    }
+  },
+  methods: {
+    enrollStudent() {
+      console.log(this.student);
     }
   }
 };

@@ -5,13 +5,18 @@ import { auth } from "@/fb";
 import store from "./store/";
 import vuetify from './plugins/vuetify';
 
+export const bus = new Vue();
+
 Vue.config.productionTip = false
 auth.languageCode = 'it';
 
 
-auth.onAuthStateChanged(user => {
-  if (user) {
 
+auth.onAuthStateChanged(user => {
+  
+  // Dispatch dell'action initialize per mostrare la schermata di login
+  store.dispatch("authentication/initialize", user);
+  if (user) {
     if (user.emailVerified) {
       // Se l'email è verificata, controllo la presenza di custom claims
       user.getIdTokenResult().then(IdTokenResult => {
@@ -33,7 +38,7 @@ auth.onAuthStateChanged(user => {
           alert("Controlla la tua casella di posta. Abbiamo inviato un link di verifica all'indirizzo specificato");
         });
     }
-  }
+  } 
 
 });
 

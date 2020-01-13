@@ -4,6 +4,7 @@ import store from '../store/'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Studenti from '../views/Studenti.vue'
+import profiloStudente from '../views/profiloStudente.vue'
 import Corso from '../views/Corso.vue'
 
 Vue.use(VueRouter)
@@ -14,6 +15,7 @@ const routes = [
     name: 'login',
     component: Login
   },
+
   {
     path: '/home',
     name: 'home',
@@ -27,7 +29,17 @@ const routes = [
     name: 'studenti',
     component: Studenti,
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresAdmin: true
+    }
+  },
+  {
+    path: '/profiloStudente',
+    name: 'profilo',
+    component: profiloStudente,
+    meta: {
+      requiresAuth: true,
+      
     }
   },
   {
@@ -53,15 +65,24 @@ const router = new VueRouter({
  * e la sua email è verificata
 */
 router.beforeEach((to, from, next) => {
-  
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
-      if (store.state.authentication.user.loggedIn && store.state.authentication.user.data.emailVerified) {
-          next()
-          return
-      }
-      next('/')
-  } else {
+    
+    if (store.getters['authentication/user'].loggedIn && store.getters['authentication/user'].data.emailVerified) {
       next()
+
+    } else {
+      next('/')
+    }
+    // Alcune routes devono essere accessibili solo agli utenti admin
+  } else if (to.matched.some(record => record.meta.requiresAdmin)){
+    if (store.getters['authentication/user'].loggedIn && store.getters['authentication/user'].isAdmin) {
+      next()
+    } else {
+      next('/home')
+    }
+  } else {
+    next()
   }
 })
 

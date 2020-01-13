@@ -74,6 +74,7 @@ export default {
   methods: {
     logout() {
       auth.signOut().then(() => {
+        store.dispatch("authentication/resetUser");
         store.dispatch("authentication/triggerMessage", true);
         this.$router.replace({ name: "login" });
       });

@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { bus } from "@/main";
 Vue.use(Vuex);
 
 // Gestisce le proprietà della sessione utente
@@ -15,7 +16,7 @@ const authentication = {
     },
     getters: {
         user(state) {
-            return state.user
+            return state.user;
         }
     },
     mutations: {
@@ -33,22 +34,36 @@ const authentication = {
         }
     },
     actions: {
+        // Emetto l'evento "authStateChanged" al caricamento dell'app
+        initialize() {
+            bus.$emit("authStateChange");
+        },
+
         fetchUser({ commit }, user) {
             commit("SET_LOGGED_IN", user !== null);
             commit("SET_ADMIN", user.admin == true);
             if (user) {
                 commit("SET_USER", {
                     email: user.email,
-                    admin: user.admin,
                     emailVerified: user.emailVerified
                 });
+                bus.$emit("authStateChange");
             } else {
                 commit("SET_USER", null);
+                bus.$emit("authStateChange");
             }
+        },
+
+        // Reset dei dati utente a fine sessione
+        resetUser({ commit }) {
+            commit("SET_LOGGED_IN", false);
+            commit("SET_ADMIN", false);
+            commit("SET_USER", null);
         },
 
         triggerMessage({ commit }, value) {
             commit("SET_MESSAGE", value);
+
         }
     }
 }
@@ -89,7 +104,7 @@ const topbar = {
 
     },
     actions: {
-        toggleTitle({ commit },value) {
+        toggleTitle({ commit }, value) {
             commit('SET_TITLE', value);
         },
         togglePage({ commit }, value) {
@@ -98,10 +113,10 @@ const topbar = {
         toggleStudents({ commit }, value) {
             commit('SET_STUDENTS', value);
         },
-        toggleHome({ commit },value) {
+        toggleHome({ commit }, value) {
             commit('SET_HOME', value);
         },
-        toggleExit({ commit },value) {
+        toggleExit({ commit }, value) {
             commit('SET_EXIT', value);
         }
     }

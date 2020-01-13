@@ -7,7 +7,7 @@
         <v-row align="center" justify="center" no-gutters>
           <v-col>
             <v-row align="center" justify="center">
-              <v-card class="elevation'12">
+              <v-card class="elevation'12 v-flex">
                 <div
                   align="center"
                   z-index="2"
@@ -105,14 +105,35 @@ export default {
       store.dispatch("authentication/triggerMessage", false);
       auth
         .signInWithEmailAndPassword(this.email, this.password)
-        .then(() => {
-          if (this.user.data.emailVerified) {
-            console.log(this.user.data.emailVerified);
+        .then(user => {
+          if (user) {
+            if (user.user.emailVerified) {
+              console.log("Email verified");
+              /*this.$store
+                .dispatch("authentication/set_isVerified", user.user)
+                .then(() => {
+                  // Se l'email è verificata, controllo la presenza di custom claims
+                  user.user.getIdTokenResult().then(IdTokenResult => {
+                    let admin = IdTokenResult.claims.admin;
+                    // Scrivo il claim admin su store
+                    this.$store
+                      .dispatch("authentication/set_admin", admin)
+                      .then(() => {
+                        console.log("Prova");
+                        this.$router
+                          .replace({ name: "home" }).catch(() => {console.log("Errore router")})
+                        
+                      }).catch((err) => console.log(err.message));
+                  });
+                })
+                .catch(err => console.log(err.message));
+            } */
           } else {
-            this.error = "Email non verificata";
+              this.error = "Email non verificata";
           }
-        })
-        .catch(err => (this.error = err.message));
+          }
+        }).catch(err => (this.error = err.message));
+        
     },
     resetPassword() {
       auth.languageCode = "it";
@@ -129,14 +150,11 @@ export default {
     }
   },
   created() {
-    
-      store.dispatch('topbar/toggleTitle',true);
-      store.dispatch('topbar/togglePage',false);
-      store.dispatch('topbar/toggleStudents',false);
-      store.dispatch('topbar/toggleHome',false);
-      store.dispatch('topbar/toggleExit', false);
-      
-    
+    store.dispatch("topbar/toggleTitle", true);
+    store.dispatch("topbar/togglePage", false);
+    store.dispatch("topbar/toggleStudents", false);
+    store.dispatch("topbar/toggleHome", false);
+    store.dispatch("topbar/toggleExit", false);
   },
   computed: {
     ...mapGetters({
