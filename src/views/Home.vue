@@ -22,27 +22,32 @@
             <v-toolbar color="blue lighten-1" dark flat>
               <h2>Iscriviti al corso</h2>
             </v-toolbar>
+            </v-card-title>
             <v-card-text>
-              <v-form>
-                <v-text-field label="Nome" v-model="student.name"></v-text-field>
-                <v-text-field label="Cognome" v-model="student.surname"></v-text-field>
-                <v-menu v-model="dateMenu" min-width="290px">
+         
+              <v-form ref="form">
+                <v-text-field label="Nome" :value="firstName" readonly></v-text-field>
+                <v-text-field label="Cognome" :value="lastName" readonly></v-text-field>
+                <v-menu v-model="dateMenu" min-width="290px" :close-on-content-click="false">
                   <template v-slot:activator="{on}">
+                    <!-- Mostro la data come stringa nel formato italiano, ma la salvo  come oggetto Date-->
                     <v-text-field
                       label="Data di nascita"
-                      v-model="formatDate"
+                      v-model="formattedDate"
+                      @blur="date = parseDate(formattedDate)"
                       prepend-icon="mdi-calendar"
                       v-on="on"
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="student.date" @input="dateMenu=false"></v-date-picker>
+                  <v-date-picker v-model="date" @input="dateMenu=false"></v-date-picker>
                 </v-menu>
+                
               </v-form>
               <v-card-actions>
                 <v-btn @click="enrollStudent">Invia</v-btn>
               </v-card-actions>
             </v-card-text>
-          </v-card-title>
+          
         </v-card>
       </v-col>
     </v-row>
@@ -52,32 +57,36 @@
 import TopBar from "../components/TopBar";
 import store from "@/store/";
 import { mapGetters } from "vuex";
+import { db } from "@/fb";
+import { auth } from "@/fb";
+
+let pattern = /^[a-zì'àè]+$/i;
+
 export default {
-  data() {
-    return {
-      student: {
-        name: "",
-        surname: "",
-        date: new Date().toISOString().substr(0, 10)
-      },
-      dateMenu: false
-    };
-  },
+  data: vm => ({
+    date: new Date().toISOString().substr(0, 10),
+    formattedDate: vm.formatDate(new Date().toISOString().substr(0, 10)),
+    
+    student: {
+      name: "",
+      surname: "",
+      birthDate: ""
+    },
+    dateMenu: false,
+    inputRules: [v => pattern.test(v) || "Inserimento non valido"]
+  }),
+
   created() {
     store
-      .dispatch("topbar/toggleTitle", true)
-      .then(() => {
-        store.dispatch("topbar/togglePage", false);
+      .dispatch("topbar/act_setBar", {
+        courseTitle: true,
+        coursePage: false,
+        students: false,
+        profile: false,
+        toHome: false,
+        exit: true
       })
-      .then(() => {
-        store.dispatch("topbar/toggleStudents", false);
-      })
-      .then(() => {
-        store.dispatch("topbar/toggleHome", false);
-      })
-      .then(() => {
-        store.dispatch("topbar/toggleExit", true);
-      });
+      
   },
   components: {
     TopBar
@@ -87,14 +96,45 @@ export default {
       user: "authentication/user",
       barprop: "topbar/barprop"
     }),
-    formatDate() {
-      let arr = this.student.date.split("-");
-      return arr[2] + "-" + arr[1] + "-" + arr[0];
+    firstName() {
+      return this.user.data.displayName.split(' ')[0];
+    },
+    lastName() {
+      return this.user.data.displayName.split(' ')[1];
     }
   },
+  
+  watch: {
+     date() {
+       this.formattedDate = this.formatDate(this.date)
+     }
+  },
+
   methods: {
+    formatDate(date) {
+      if (!date) return null;
+      const [year, month, day] = date.split("-");
+      return `${day}-${month}-${year}`;
+    },
+    parseDate(date) {
+      if (!date) return null;
+
+      const [day, month, year] = date.split("-");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    },
+    // Carica su Firebase i dati dal form di iscrizione
     enrollStudent() {
-      console.log(this.student);
+      if (this.$refs.form.validate()) {
+        db.collection("students")
+        .doc(auth.currentUser.uid)
+          .set({
+            birthDate: new Date(this.date)
+          })
+          .then(() => {
+            console.log("Student added to db.");
+            this.$refs.form.reset();
+          });
+      }
     }
   }
 };

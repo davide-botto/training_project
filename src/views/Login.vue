@@ -15,40 +15,40 @@
                 >Arrivederci, sei stato logged out</div>
                 <v-card-title>
                   <h2>Accedi</h2>
-                  <v-card-text class="text-center">
-                    <div v-show="error" class="red--text">{{ error }}</div>
-                    <v-form ref="form" @submit.prevent="login" id="login-form">
-                      <v-text-field
-                        v-model="email"
-                        placeholder="Email"
-                        :rules="[rules.required, rules.emailFormat]"
-                        prepend-icon="mdi-account"
-                      ></v-text-field>
-                      <v-text-field
-                        v-model="password"
-                        placeholder="Password"
-                        :rules="[rules.required]"
-                        prepend-icon="mdi-lock"
-                        type="password"
-                      ></v-text-field>
-                    </v-form>
-                  </v-card-text>
-                  <v-card-actions class="justify-center">
-                    <v-container>
-                      <v-row>
-                        <v-col cols="6">
-                          <v-btn block color="blue" dark form="login-form" type="submit">LOGIN</v-btn>
-                        </v-col>
-                        <v-col cols="6">
-                          <SignUp />
-                        </v-col>
-                        <v-col cols="12">
-                          <v-btn block @click="inputDialog = true">Hai dimenticato la password?</v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-actions>
                 </v-card-title>
+                <v-card-text class="text-center">
+                  <div v-show="error" class="red--text">{{ error }}</div>
+                  <v-form ref="form" @submit.prevent="login" id="login-form">
+                    <v-text-field
+                      v-model="email"
+                      placeholder="Email"
+                      :rules="[rules.required, rules.emailFormat]"
+                      prepend-icon="mdi-account"
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="password"
+                      placeholder="Password"
+                      :rules="[rules.required]"
+                      prepend-icon="mdi-lock"
+                      type="password"
+                    ></v-text-field>
+                  </v-form>
+                </v-card-text>
+                <v-card-actions class="justify-center">
+                  <v-container>
+                    <v-row>
+                      <v-col cols="6">
+                        <v-btn block color="blue" dark form="login-form" type="submit">LOGIN</v-btn>
+                      </v-col>
+                      <v-col cols="6">
+                        <SignUp />
+                      </v-col>
+                      <v-col cols="12">
+                        <v-btn block @click="inputDialog = true">Hai dimenticato la password?</v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card-actions>
               </v-card>
             </v-row>
           </v-col>
@@ -57,7 +57,7 @@
     </v-content>
 
     <v-dialog v-model="inputDialog" max-width="400px">
-      <v-card>
+      <v-card class="d-flex justify center">
         <v-card-title>
           <h3>Reset password</h3>
           <div v-show="error" class="red--text">{{ error }}</div>
@@ -81,7 +81,6 @@
 import { auth } from "@/fb";
 import SignUp from "../components/SignUp";
 import TopBar from "../components/TopBar";
-import store from "../store/";
 import { mapGetters } from "vuex";
 
 export default {
@@ -102,7 +101,7 @@ export default {
   },
   methods: {
     login() {
-      store.dispatch("authentication/triggerMessage", false);
+      this.$store.dispatch("authentication/triggerMessage", false);
       auth
         .signInWithEmailAndPassword(this.email, this.password)
         .then(user => {
@@ -128,12 +127,12 @@ export default {
                 })
                 .catch(err => console.log(err.message));
             } */
-          } else {
+            } else {
               this.error = "Email non verificata";
+            }
           }
-          }
-        }).catch(err => (this.error = err.message));
-        
+        })
+        .catch(err => (this.error = err.message));
     },
     resetPassword() {
       auth.languageCode = "it";
@@ -150,11 +149,14 @@ export default {
     }
   },
   created() {
-    store.dispatch("topbar/toggleTitle", true);
-    store.dispatch("topbar/togglePage", false);
-    store.dispatch("topbar/toggleStudents", false);
-    store.dispatch("topbar/toggleHome", false);
-    store.dispatch("topbar/toggleExit", false);
+    this.$store.dispatch("topbar/act_setBar", {
+        courseTitle: true,
+        coursePage: false,
+        students: false,
+        profile: false,
+        toHome: false,
+        exit: false
+      })
   },
   computed: {
     ...mapGetters({

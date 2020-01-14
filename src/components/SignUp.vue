@@ -17,6 +17,15 @@
           </div>
 
           <v-form ref="form" @submit.prevent="signUp" id="signupForm">
+            <v-row>
+              <v-col>
+                <v-text-field placeholder="Nome" v-model="name" :rules="[rules.nameSurname]"></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field placeholder="Cognome" v-model="surname" :rules="[rules.nameSurname]"></v-text-field>
+              </v-col>
+            </v-row>
+
             <v-text-field
               v-model="email"
               placeholder="Email"
@@ -54,11 +63,14 @@ export default {
   data() {
     return {
       dialog: false,
+      name: "",
+      surname: "",
       email: "",
       password: "",
       re_password: "",
       error: null,
       rules: {
+        nameSurname: v => /^[A-Z][a-zì'àè]+$/.test(v) || "Iniziale maiuscola",
         emailFormat: v =>
           /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
             v
@@ -84,7 +96,10 @@ export default {
         this.email,
         this.password
       );
-      promise.then(() => {
+      promise.then(data => {
+        data.user.updateProfile({
+          displayName: this.name + " " + this.surname
+        });
         this.dialog = false;
         this.$refs.form.reset();
         this.error = null;

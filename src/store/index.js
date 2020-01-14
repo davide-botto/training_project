@@ -28,6 +28,7 @@ const authentication = {
         },
         SET_USER(state, data) {
             state.user.data = data;
+            bus.$emit("authStateChange");
         },
         SET_MESSAGE(state, value) {
             state.user.message = value
@@ -44,13 +45,14 @@ const authentication = {
             commit("SET_ADMIN", user.admin == true);
             if (user) {
                 commit("SET_USER", {
+                    displayName: user.displayName,
                     email: user.email,
                     emailVerified: user.emailVerified
                 });
-                bus.$emit("authStateChange");
+
             } else {
                 commit("SET_USER", null);
-                bus.$emit("authStateChange");
+
             }
         },
 
@@ -73,11 +75,7 @@ const topbar = {
     namespaced: true,
     state: {
         barprop: {
-            courseTitle: false,
-            coursePage: false,
-            students: false,
-            home: false,
-            exit: false
+            data: null
         }
     },
     getters: {
@@ -86,38 +84,22 @@ const topbar = {
         }
     },
     mutations: {
-        SET_TITLE(state, value) {
-            state.barprop.courseTitle = value
+        mut_SET_BAR(state, data) {
+            state.barprop.data = data
         },
-        SET_PAGE(state, value) {
-            state.barprop.coursePage = value
-        },
-        SET_STUDENTS(state, value) {
-            state.barprop.students = value
-        },
-        SET_HOME(state, value) {
-            state.barprop.home = value
-        },
-        SET_EXIT(state, value) {
-            state.barprop.exit = value
-        }
 
     },
     actions: {
-        toggleTitle({ commit }, value) {
-            commit('SET_TITLE', value);
-        },
-        togglePage({ commit }, value) {
-            commit('SET_PAGE', value);
-        },
-        toggleStudents({ commit }, value) {
-            commit('SET_STUDENTS', value);
-        },
-        toggleHome({ commit }, value) {
-            commit('SET_HOME', value);
-        },
-        toggleExit({ commit }, value) {
-            commit('SET_EXIT', value);
+        act_setBar({ commit }, bar) {
+            commit("mut_SET_BAR", {
+                courseTitle: bar.courseTitle,
+                coursePage: bar.coursePage,
+                students: bar.students,
+                profile: bar.profile,
+                toHome: bar.toHome,
+                exit: bar.exit
+            })
+
         }
     }
 }
