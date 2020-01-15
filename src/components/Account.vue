@@ -8,14 +8,7 @@
       </template>
       <v-list>
         <v-list-item @click.stop="outputDialog=true">Account</v-list-item>
-
-        <!-- Rendo visibile questa voce solo se l'utente è admin -->
-        <v-list-item
-          v-show="user.loggedIn && user.isAdmin"
-          @click="inputDialog=true"
-        >
-        Nuovo admin
-        </v-list-item>
+        <v-list-item @click="toChangePassword">Cambio password</v-list-item>
 
         <v-list-item @click="logout">Esci</v-list-item>
       </v-list>
@@ -33,73 +26,37 @@
         </v-card-title>
       </v-card>
     </v-dialog>
-
-    <!-- Dialog di inserimento email utente da rendere admin -->
-    
-    <v-dialog v-model="inputDialog" max-width="400px">
-      <v-card>
-        <v-card-title>
-          <h3>Rendi un utente amministratore</h3>
-          <div v-show="error" class="red--text">{{ error }}</div>
-          <v-card-text>
-            <v-form ref="form">
-              <v-text-field v-model="adminEmail" placeholder="Email utente"></v-text-field>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn class="success" dark @click="newAdmin">Invia</v-btn>
-          </v-card-actions>
-        </v-card-title>
-      </v-card>
-   </v-dialog>
   </div>
 </template>
 
 <script>
 import { auth } from "@/fb";
 import { mapGetters } from "vuex";
-import { functions } from "@/fb";
 import store from "../store/";
 
 export default {
   data() {
     return {
-      inputDialog: false,
-      outputDialog: false,
-      adminEmail: "",
-      error: null,
-      
+      outputDialog: false
     };
   },
   methods: {
     logout() {
       auth.signOut().then(() => {
-        store.dispatch("authentication/resetUser");
-        store.dispatch("authentication/triggerMessage", true);
+        store.dispatch("authentication/act_resetUser");
+        store.dispatch("authentication/act_triggerMessage", true);
         this.$router.replace({ name: "login" });
       });
     },
-    newAdmin() {
-      // Chiamo la cloud function
-      const addAdminRole = functions.httpsCallable("addAdminRole");
-      addAdminRole({ email: this.adminEmail })
-        .then(result => {
-          console.log(result);
-          this.inputDialog = false;
-          this.$refs.form.reset();
-        })
-        .catch(err => {
-          this.error = err.message;
-        });
-    },
-    
+    toChangePassword() {
+      this.$router.replace({name: "changePassword"});
+    }
   },
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
       user: "authentication/user"
     })
-  },
-  
+  }
 };
 </script>

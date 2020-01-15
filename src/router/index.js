@@ -2,10 +2,12 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store/'
 import Home from '../views/Home.vue'
+import adminPanel from '../views/adminPanel.vue'
 import Login from '../views/Login.vue'
 import Studenti from '../views/Studenti.vue'
 import profiloStudente from '../views/profiloStudente.vue'
 import Corso from '../views/Corso.vue'
+import ChangePassword from '../views/ChangePassword.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +24,15 @@ const routes = [
     component: Home,
     meta: {
       requiresAuth: true
+    }
+  },
+  {
+    path: '/adminPanel',
+    name: 'adminPanel',
+    component: adminPanel,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true
     }
   },
   {
@@ -46,6 +57,14 @@ const routes = [
     path: '/corso',
     name: 'corso',
     component: Corso,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/changePassword',
+    name: 'changePassword',
+    component: ChangePassword,
     meta: {
       requiresAuth: true
     }
@@ -79,8 +98,10 @@ router.beforeEach((to, from, next) => {
     if (store.getters['authentication/user'].loggedIn && store.getters['authentication/user'].isAdmin) {
       next()
     } else {
-      next('/home')
-    }
+      
+        next('/home')
+      }
+    
   } else {
     next()
   }

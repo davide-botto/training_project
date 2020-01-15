@@ -41,7 +41,7 @@
                         <v-btn block color="blue" dark form="login-form" type="submit">LOGIN</v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <SignUp />
+                        <SignUp/>
                       </v-col>
                       <v-col cols="12">
                         <v-btn block @click="inputDialog = true">Hai dimenticato la password?</v-btn>
@@ -96,12 +96,13 @@ export default {
             v
           ) || "Formato email non valido",
         required: value => !!value || "Campo necessario"
-      }
+      },
+      
     };
   },
   methods: {
     login() {
-      this.$store.dispatch("authentication/triggerMessage", false);
+      this.$store.dispatch("authentication/act_triggerMessage", false);
       auth
         .signInWithEmailAndPassword(this.email, this.password)
         .then(user => {

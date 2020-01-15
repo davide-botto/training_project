@@ -1,12 +1,14 @@
 <template>
-  <v-dialog max-width="600px" v-model="dialog">
-    <template v-slot:activator="{on}">
-      <v-btn outlined block color="blue" v-on="on">Registrati</v-btn>
-    </template>
-    <v-card>
-      <v-card-title>
-        <h2>Nuovo utente</h2>
-        <div v-show="error" class="red--text">{{ error }}</div>
+  <div class="registration2">
+    <v-dialog max-width="600px" v-model="dialog">
+      <template v-slot:activator="{on}">
+        <v-btn outlined block color="blue" v-on="on">Registrati</v-btn>
+      </template>
+      <v-card>
+        <v-card-title>
+          <h2>Nuovo utente</h2>
+          <div v-show="error" class="red--text">{{ error }}</div>
+        </v-card-title>
         <v-card-text>
           <div>
             Una password valida deve contenere almeno 8 simboli, tra cui:
@@ -16,43 +18,54 @@
             </ul>
           </div>
 
-          <v-form ref="form" @submit.prevent="signUp" id="signupForm">
-            <v-row>
-              <v-col>
-                <v-text-field placeholder="Nome" v-model="name" :rules="[rules.nameSurname]"></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field placeholder="Cognome" v-model="surname" :rules="[rules.nameSurname]"></v-text-field>
-              </v-col>
-            </v-row>
+          
+            <v-form ref="form" @submit.prevent="signUp" id="signupForm">
+              <v-row>
+                <v-col>
+                  <v-text-field placeholder="Nome" v-model="name" :rules="[rules.nameSurname]"></v-text-field>
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    placeholder="Cognome"
+                    v-model="surname"
+                    :rules="[rules.nameSurname]"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
 
-            <v-text-field
-              v-model="email"
-              placeholder="Email"
-              :rules="[rules.required, rules.emailFormat]"
-              prepend-icon="mdi-account"
-            ></v-text-field>
-            <v-text-field
-              v-model="password"
-              placeholder="Scegli password"
-              :rules="[rules.required, rules.content]"
-              type="password"
-              prepend-icon="mdi-lock"
-            ></v-text-field>
-            <!-- Richiedo di ripetere la password e controllo il matching -->
-            <v-text-field
-              v-model="re_password"
-              placeholder="Ripeti password"
-              :rules="[passwordConfirmationRule]"
-              type="password"
-              prepend-icon="mdi-lock"
-            ></v-text-field>
-            <v-btn class="mr-4" color="blue" dark type="submit" form="signupForm">Invia</v-btn>
-          </v-form>
+              <v-text-field
+                v-model="email"
+                placeholder="Email"
+                :rules="[rules.required, rules.emailFormat]"
+                prepend-icon="mdi-account"
+              ></v-text-field>
+              <v-text-field
+                v-model="password"
+                placeholder="Scegli password"
+                :rules="[rules.required, rules.content]"
+                type="password"
+                prepend-icon="mdi-lock"
+              ></v-text-field>
+              <!-- Richiedo di ripetere la password e controllo il matching -->
+              <v-text-field
+                v-model="re_password"
+                placeholder="Ripeti password"
+                :rules="[passwordConfirmationRule]"
+                type="password"
+                prepend-icon="mdi-lock"
+              ></v-text-field>
+              <v-btn class="mr-4" color="blue" dark type="submit" form="signupForm">Invia</v-btn>
+            </v-form>
+    
+         
         </v-card-text>
-      </v-card-title>
-    </v-card>
-  </v-dialog>
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="snackbar" top>
+      Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato
+      <v-btn @click.prevent="snackbar = false" dark>Chiudi</v-btn>
+    </v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -60,9 +73,11 @@
 import { auth } from "@/fb";
 
 export default {
+  
   data() {
     return {
       dialog: false,
+      snackbar: false,
       name: "",
       surname: "",
       email: "",
@@ -90,6 +105,7 @@ export default {
       }
     };
   },
+  
   methods: {
     signUp() {
       const promise = auth.createUserWithEmailAndPassword(
@@ -104,20 +120,17 @@ export default {
         this.$refs.form.reset();
         this.error = null;
       });
+
+      // Invio link di verifica email
+      promise.then(() => {
+        let user = auth.currentUser;
+        user.sendEmailVerification().then(() => {
+          console.log("Email verification");
+          this.snackbar = true;
+        });
+      });
       promise.catch(err => (this.error = err.message));
-      // verifico l'email dell'utente
-      /*auth.onAuthStateChanged(user => {
-        if (user) {
-          user
-            .sendEmailVerification()
-            .then(() => {
-              console.log("Email verification");
-              alert("Controlla la tua casella di posta. Abbiamo inviato un link di verifica all'indirizzo specificato");
-              });
-        } else {
-          console.log("Not logged in");
-        }
-      });*/
+      
     }
   },
   computed: {

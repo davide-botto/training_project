@@ -25,14 +25,7 @@
         </v-row>
         <!-- Mostro i buttons di modifica e cancellazione solo se l'utente è admin -->
         <div v-show="user.loggedIn && user.isAdmin" id="handle-student">
-          <Popup :student="student" />
-          <v-btn
-            class="px-2 grey lighten-2"
-            min-width="0"
-            max-width="20px"
-            max-height="20px"
-            @click="removeStudent(student.id)"
-          >x</v-btn>
+         <DialogConfirm :student="student" :dialogContent="dialogContent"/>
         </div>
         <v-divider></v-divider>
       </v-card>
@@ -42,8 +35,8 @@
 
 <script>
 // @ is an alias to /src
-import Popup from "../components/Popup";
 import TopBar from "../components/TopBar";
+import DialogConfirm from "../components/DialogConfirm";
 import { mapGetters } from "vuex";
 import { db } from "@/fb";
 
@@ -52,7 +45,11 @@ export default {
   data() {
     return {
       students: [],
-      showMenu: false
+      showMenu: false,
+      dialogContent: {
+        title: "Cancellazione studente",
+        message: "Confermi di voler cancellare lo studente"
+      }
     };
   },
   methods: {
@@ -66,15 +63,7 @@ export default {
         this.students.sort((a, b) => (a[prop] < b[prop] ? -1 : 1));
       }
     },
-    removeStudent: function(arg) {
-      db.collection("students")
-        .doc(arg)
-        .delete()
-        .then(() => {
-          console.log("Student deleted from db");
-          console.log(arg);
-        });
-    },
+    
     show: function(event) {
       event.preventDefault;
       this.showMenu = true;
@@ -96,15 +85,15 @@ export default {
         changes.forEach(change => {
           if (change.type === "added") {
             console.log(
-              new Date(change.doc.data().birthDate.seconds*1000)
+              new Date(change.doc.data().birthDate.seconds * 1000)
                 .toISOString()
                 .substr(0, 10)
             );
-            
+
             this.students.push({
               name: change.doc.data().name,
               surname: change.doc.data().surname,
-              birthDate: new Date(change.doc.data().birthDate.seconds*1000)
+              birthDate: new Date(change.doc.data().birthDate.seconds * 1000)
                 .toISOString()
                 .substr(0, 10),
               id: change.doc.id
@@ -126,18 +115,18 @@ export default {
     );
 
     this.$store.dispatch("topbar/act_setBar", {
-        courseTitle: false,
-        coursePage: false,
-        students: true,
-        profile: false,
-        toHome: true,
-        exit: true
-      })
+      courseTitle: false,
+      coursePage: false,
+      students: true,
+      profile: false,
+      toHome: true,
+      exit: true
+    });
   },
 
   components: {
-    Popup,
-    TopBar
+    TopBar,
+    DialogConfirm
   }
 };
 </script>
