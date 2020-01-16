@@ -73,19 +73,32 @@
         </v-card-title>
       </v-card>
     </v-dialog>
-  </v-app>
+    <Snackbar :snackbarProps="snackbarProps" />
+    <resendEmail :dialogProps="dialogProps" />
+    </v-app>
   <!-- </div> -->
 </template>
 
 <script>
 import { auth } from "@/fb";
+import {bus} from "@/main";
 import SignUp from "../components/SignUp";
 import TopBar from "../components/TopBar";
+import Snackbar from "../components/Snackbar";
+import resendEmail from "../components/resendEmail";
 import { mapGetters } from "vuex";
 
 export default {
   data() {
     return {
+      snackbarProps: {
+        message: "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato",
+        color: ""
+      },
+      dialogProps: {
+        title: "Email non verificata",
+        message: "Controlla nella spam, altrimenti reinvia una mail di verifica."
+      },
       email: "",
       password: "",
       error: null,
@@ -107,6 +120,7 @@ export default {
         .signInWithEmailAndPassword(this.email, this.password)
         .then(user => {
           if (user) {
+            console.log(user.user.emailVerified);
             if (user.user.emailVerified) {
               console.log("Email verified");
               /*this.$store
@@ -130,6 +144,8 @@ export default {
             } */
             } else {
               this.error = "Email non verificata";
+              console.log(this.error)
+              bus.$emit("openResendPopup");
             }
           }
         })
@@ -140,9 +156,7 @@ export default {
       auth
         .sendPasswordResetEmail(this.email)
         .then(() => {
-          alert(
-            "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato"
-          );
+          bus.$emit("snackbarMessage");
           this.inputDialog = false;
           this.$refs.form.reset();
         })
@@ -168,7 +182,9 @@ export default {
   },
   components: {
     TopBar,
-    SignUp
+    SignUp,
+    Snackbar,
+    resendEmail
   }
 };
 </script>

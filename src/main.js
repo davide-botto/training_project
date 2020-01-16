@@ -6,6 +6,7 @@ import store from "./store/";
 import vuetify from './plugins/vuetify';
 import { db } from './fb';
 
+
 export const bus = new Vue();
 
 Vue.config.productionTip = false
@@ -43,12 +44,7 @@ auth.onAuthStateChanged(user => {
     } else {
       // Se l'email non è verificata, invio un link di verifica
       console.log("Email non verificata");
-      /*user
-        .sendEmailVerification()
-        .then(() => {
-          console.log("Email verification");
-          alert("Controlla la tua casella di posta. Abbiamo inviato un link di verifica all'indirizzo specificato");
-        });*/
+      
     }
   }
 

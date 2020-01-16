@@ -25,11 +25,19 @@
         </v-row>
         <!-- Mostro i buttons di modifica e cancellazione solo se l'utente è admin -->
         <div v-show="user.loggedIn && user.isAdmin" id="handle-student">
+          <v-btn
+        class="px-2 grey lighten-2"
+        min-width="0"
+        max-width="20px"
+        max-height="20px"
+        @click="triggerPopup"
+      >x</v-btn>
          <DialogConfirm :student="student" :dialogContent="dialogContent"/>
         </div>
         <v-divider></v-divider>
       </v-card>
     </v-container>
+    
   </div>
 </template>
 
@@ -39,6 +47,7 @@ import TopBar from "../components/TopBar";
 import DialogConfirm from "../components/DialogConfirm";
 import { mapGetters } from "vuex";
 import { db } from "@/fb";
+import {bus} from "@/main";
 
 export default {
   name: "home",
@@ -46,6 +55,8 @@ export default {
     return {
       students: [],
       showMenu: false,
+      
+      // Contenuti da passare al componente DialogConfirm
       dialogContent: {
         title: "Cancellazione studente",
         message: "Confermi di voler cancellare lo studente"
@@ -67,6 +78,9 @@ export default {
     show: function(event) {
       event.preventDefault;
       this.showMenu = true;
+    },
+    triggerPopup() {
+      bus.$emit("openPopup");
     }
   },
 

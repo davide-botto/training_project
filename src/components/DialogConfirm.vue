@@ -1,19 +1,13 @@
 <template>
   <v-dialog v-model="dialog" :max-width="options.width" @keydown.esc="cancel">
-    <template v-slot:activator="{on}">
-      <v-btn
-        class="px-2 grey lighten-2"
-        min-width="0"
-        max-width="20px"
-        max-height="20px"
-        v-on="on"
-      >x</v-btn>
-    </template>
+    <!-- Il dialog di conferma viene aperto all'evento "openPopup" emesso dal bus -->
+
     <v-card>
       <v-toolbar dark :color="options.color" dense flat>
         <v-toolbar-title>{{dialogContent.title}}</v-toolbar-title>
       </v-toolbar>
-      <v-card-text class="pa-4">{{dialogMessage}}
+      <v-card-text class="pa-4">
+        {{dialogMessage}}
         <div v-show="error" class="red--text">{{error}}</div>
       </v-card-text>
       <v-card-actions>
@@ -27,6 +21,7 @@
 
 <script>
 import { db } from "@/fb";
+import {bus} from "@/main";
 export default {
   props: {
     student: {
@@ -41,10 +36,6 @@ export default {
     return {
       dialog: false,
       error: null,
-      title: "Cancellazione studente",
-      message: "Confermi di voler cancellare lo studente",
-      resolve: null,
-      reject: null,
       options: {
         color: "primary",
         width: 290,
@@ -52,9 +43,14 @@ export default {
       }
     };
   },
+  created() {
+    bus.$on("openPopup", () => {
+      console.log("Evento open popup")
+      this.dialog = true
+    });
+  },
   methods: {
     cancel() {
-      this.resolve(false);
       this.dialog = false;
     },
     removeStudent: function(arg) {
@@ -66,20 +62,24 @@ export default {
           // Dopo la cancellazione setto la proprietà "isEnrolled a false"
           this.$store.dispatch("authentication/act_SET_ENROLLED", false);
           this.dialog=false;
-          this.resolve(true);
         }).catch(() => this.error = "Cancellazione non riuscita");
     },
   },
   computed: {
     dialogMessage() {
-      return (
-        this.dialogContent.message +
+      let string;
+      if (this.student.name) {
+        string = this.dialogContent.message +
         " " +
         this.student.surname +
         " " +
-        this.student.name +
-        "?"
-      );
+        this.student.name
+        
+      } else {
+        string = this.dialogContent.message
+      }
+      
+      return string + "?";
     }
   }
 };

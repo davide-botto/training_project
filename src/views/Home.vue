@@ -1,12 +1,12 @@
 <template>
-<!-- Vista Home del profilo studente -->
+  <!-- Vista Home del profilo studente -->
   <div class="home">
     <TopBar />
     <v-bottom-navigation horizontal>
       <v-btn router to="/corso">
         <span>Pagina del corso</span>
       </v-btn>
-      
+
       <v-btn router to="/profiloStudente">
         <span>Profilo studente</span>
       </v-btn>
@@ -22,35 +22,32 @@
               <h2 v-if="user.isEnrolled">Sei già iscritto</h2>
               <h1 v-else>Iscriviti al corso</h1>
             </v-toolbar>
-            </v-card-title>
-            <v-card-text>
-         
-              <v-form ref="form">
-                <v-text-field label="Nome" :value="firstName" readonly></v-text-field>
-                <v-text-field label="Cognome" :value="lastName" readonly></v-text-field>
-                <v-menu v-model="dateMenu" min-width="290px" :close-on-content-click="false">
-                  <template v-slot:activator="{on}">
-                    <!-- Mostro la data come stringa nel formato italiano, ma la salvo  come oggetto Date-->
-                    <v-text-field
-                      label="Data di nascita"
-                      v-show="!user.isEnrolled"
-                      v-model="formattedDate"
-                      @blur="date = parseDate(formattedDate)"
-                      prepend-icon="mdi-calendar"
-                      v-on="on"
-                    ></v-text-field>
-                    
-                  </template>
-                  <v-date-picker v-show="!user.isEnrolled" v-model="date" @input="dateMenu=false"></v-date-picker>
-                </v-menu>
-                
-              </v-form>
-              <v-card-actions>
-                <v-btn v-if="user.isEnrolled" @click="deleteEnrollment">Cancella iscrizione</v-btn>
-                <v-btn v-else @click="enrollStudent">Invia</v-btn>
-              </v-card-actions>
-            </v-card-text>
-          
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="form">
+              <v-text-field label="Nome" :value="firstName" readonly></v-text-field>
+              <v-text-field label="Cognome" :value="lastName" readonly></v-text-field>
+              <v-menu v-model="dateMenu" min-width="290px" :close-on-content-click="false">
+                <template v-slot:activator="{on}">
+                  <!-- Mostro la data come stringa nel formato italiano, ma la salvo  come oggetto Date-->
+                  <v-text-field
+                    label="Data di nascita"
+                    v-show="!user.isEnrolled"
+                    v-model="formattedDate"
+                    @blur="date = parseDate(formattedDate)"
+                    prepend-icon="mdi-calendar"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-show="!user.isEnrolled" v-model="date" @input="dateMenu=false"></v-date-picker>
+              </v-menu>
+            </v-form>
+            <v-card-actions>
+              <v-btn v-if="user.isEnrolled" @click="triggerPopup">Cancella iscrizione</v-btn>
+              <v-btn v-else @click="enrollStudent">Invia</v-btn>
+            </v-card-actions>
+          </v-card-text>
+          <DialogConfirm :student="student" :dialogContent="dialogContent"/>
         </v-card>
       </v-col>
     </v-row>
@@ -58,42 +55,44 @@
 </template>
 <script>
 import TopBar from "../components/TopBar";
+import DialogConfirm from "../components/DialogConfirm";
 import { mapGetters } from "vuex";
 import { db } from "@/fb";
 import { auth } from "@/fb";
+import { bus } from "@/main";
 
 let pattern = /^[a-zì'àè]+$/i;
 
 export default {
-
   data: vm => ({
     date: new Date().toISOString().substr(0, 10),
     formattedDate: vm.formatDate(new Date().toISOString().substr(0, 10)),
-    
+
     student: {
-      name: "",
-      surname: "",
-      birthDate: ""
+          
+      id: auth.currentUser.uid
     },
-    
+    dialogContent: {
+      title: "Cancella iscrizione",
+      message: "Confermi di voler cancellare la tua iscrizione al corso"
+    },
     dateMenu: false,
     inputRules: [v => pattern.test(v) || "Inserimento non valido"]
   }),
 
   created() {
-    this.$store
-      .dispatch("topbar/act_setBar", {
-        courseTitle: true,
-        coursePage: false,
-        students: false,
-        profile: false,
-        toHome: false,
-        exit: true
-      })
-      
+    this.$store.dispatch("topbar/act_setBar", {
+      courseTitle: true,
+      coursePage: false,
+      students: false,
+      profile: false,
+      toHome: false,
+      exit: true
+    });
   },
   components: {
-    TopBar
+    TopBar,
+    DialogConfirm
   },
   computed: {
     ...mapGetters({
@@ -101,17 +100,17 @@ export default {
       barprop: "topbar/barprop"
     }),
     firstName() {
-      return this.user.data.displayName.split(' ')[0];
+      return this.user.data.displayName.split(" ")[0];
     },
     lastName() {
-      return this.user.data.displayName.split(' ')[1];
+      return this.user.data.displayName.split(" ")[1];
     }
   },
-  
+
   watch: {
-     date() {
-       this.formattedDate = this.formatDate(this.date)
-     }
+    date() {
+      this.formattedDate = this.formatDate(this.date);
+    }
   },
 
   methods: {
@@ -130,7 +129,7 @@ export default {
     enrollStudent() {
       if (this.$refs.form.validate()) {
         db.collection("students")
-        .doc(auth.currentUser.uid)
+          .doc(auth.currentUser.uid)
           .set({
             name: this.firstName,
             surname: this.lastName,
@@ -141,17 +140,13 @@ export default {
 
             // Setto a true la proprietà "isEnrolled"
             this.$store.dispatch("authentication/act_SET_ENROLLED", true);
-            
-          }).catch(err => console.log(err.message));
+          })
+          .catch(err => console.log(err.message));
       }
     },
-    deleteEnrollment() {
-      db.collection("students").doc(auth.currentUser.uid)
-      .delete()
-      .then(() => {
-        console.log("Student deleted from db");
-        this.$store.dispatch("authentication/act_SET_ENROLLED", false);
-      }).catch((err) => console.log(err.message))
+    
+    triggerPopup() {
+      bus.$emit("openPopup");
     }
   }
 };

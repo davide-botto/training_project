@@ -8,6 +8,7 @@ import Studenti from '../views/Studenti.vue'
 import profiloStudente from '../views/profiloStudente.vue'
 import Corso from '../views/Corso.vue'
 import ChangePassword from '../views/ChangePassword.vue'
+import HandleEmailPassword from '../views/HandleEmailPassword.vue'
 
 Vue.use(VueRouter)
 
@@ -68,6 +69,12 @@ const routes = [
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: '/handleEmailPassword',
+    name: 'handleEmailPassword',
+    component: HandleEmailPassword,
+    
   }
 ]
 

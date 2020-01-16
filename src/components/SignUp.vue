@@ -61,23 +61,25 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="snackbar" top>
-      Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato
-      <v-btn @click.prevent="snackbar = false" dark>Chiudi</v-btn>
-    </v-snackbar>
+    <Snackbar :snackbarProps="snackbarProps" />
+    <!-- <v-snackbar v-model="snackbar" top> -->
+      <!-- Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato -->
+      <!-- <v-btn @click.prevent="snackbar = false" dark>Chiudi</v-btn> -->
+    <!-- </v-snackbar> -->
   </div>
 </template>
 
 <script>
 //import {db} from "@/fb";
 import { auth } from "@/fb";
+import {bus} from "@/main";
+import Snackbar from "./Snackbar";
 
 export default {
   
   data() {
     return {
       dialog: false,
-      snackbar: false,
       name: "",
       surname: "",
       email: "",
@@ -102,6 +104,10 @@ export default {
           /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)(?=.*[^ ]).*$/.test(
             v
           ) || "Formato password non valido"
+      },
+      snackbarProps: {
+        message: "Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato",
+        color: ""
       }
     };
   },
@@ -126,7 +132,9 @@ export default {
         let user = auth.currentUser;
         user.sendEmailVerification().then(() => {
           console.log("Email verification");
-          this.snackbar = true;
+         
+          bus.$emit("snackbarMessage");
+
         });
       });
       promise.catch(err => (this.error = err.message));
@@ -137,6 +145,9 @@ export default {
     passwordConfirmationRule() {
       return this.password === this.re_password || "Le password non coincidono";
     }
+  },
+  components: {
+    Snackbar
   }
 };
 </script>
