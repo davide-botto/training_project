@@ -30,7 +30,8 @@ auth.onAuthStateChanged(user => {
         let docRef = db.collection("students").doc(user.uid);
         docRef.get().then(doc => {
           store.dispatch("authentication/act_SET_ENROLLED", doc.exists);
-        })
+        }).catch(err => console.log(err.message));
+        
         if (user.admin) {
           router.replace({ name: "adminPanel" }).catch(err => console.log(err.message));
         } else {

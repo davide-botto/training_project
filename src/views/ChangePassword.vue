@@ -9,11 +9,11 @@
     <v-card>
       <v-card-text>
         <v-form id="changePasswordForm">
-          <v-text-field v-model="currentPassword" placeholder="Vecchia password" type="password"></v-text-field>
+          <v-text-field v-model="currentPassword" placeholder="Vecchia password" type="password" :rules="[rules.required, rules.passwordFormat]"></v-text-field>
           <v-text-field
             v-model="newPassword"
             placeholder="Nuova password"
-            :rules="[rules.required, rules.content, sameAsOldPassword]"
+            :rules="[rules.required, rules.passwordFormat, sameAsOldPassword]"
             type="password"
           ></v-text-field>
           <v-text-field
@@ -44,20 +44,6 @@ export default {
       currentPassword: "",
       newPassword: "",
       re_newPassword: "",
-      rules: {
-        required: value => !!value || "Campo necessario",
-        /**Regole Password:
-         * almeno 8 simboli
-         * almeno una lettera minuscola
-         * almeno una lettera maiuscola
-         * almeno un numero
-         * almeno un carattere speciale
-         */
-        content: v =>
-          /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)(?=.*[^ ]).*$/.test(
-            v
-          ) || "Formato password non valido"
-      },
       snackbarProps: {
         message:
           "La tua password è stata modificata con successo. Puoi tornare alla home",
@@ -90,7 +76,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "authentication/user"
+      user: "authentication/user",
+      rules: "validateFormRules/rules"
     }),
     sameAsOldPassword() {
       return (

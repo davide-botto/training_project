@@ -5,32 +5,67 @@
     <v-container>
       <v-row>
         <v-col cols="12" md="6">
-          <v-card>
-            <v-card-title>Account admin</v-card-title>
-            <v-card-text>
-              <div>{{user.data.displayName}}</div>
-              <div>{{user.data.email}}</div>
-            </v-card-text>
+          <v-card height="200">
+            <v-row>
+              <v-col class="ml-2">
+                <h3>Account admin</h3>
+              </v-col>
+            </v-row>
+
+            <v-row align="center">
+              <v-col cols="5" md="3" align="center">
+                <v-avatar size="90">
+                  <img src="https://www.svgrepo.com/show/34094/teacher.svg" alt="Ising" />
+                </v-avatar>
+              </v-col>
+              <v-col cols="6" md="6">
+                <v-row>
+                  <v-col>
+                    <h2>{{user.data.displayName}}</h2>
+                  </v-col>
+                </v-row>
+                <v-row class="hidden-sm-and-down">
+                  <v-col>{{user.data.email}}</v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </v-card>
+          <v-row class="hidden-md-and-up">
+            <v-col cols="12" align="center">{{user.data.email}}</v-col>
+          </v-row>
         </v-col>
         <v-col cols="6" md="3">
-          <v-btn
-            block
-            router
-            to="/studenti"
-            style="text-transform: none"
-           
-          >
-            Studenti iscritti
-            <v-icon>mdi-account-group</v-icon>
+          <v-btn block router to="/studenti" style="text-transform: none" height="200">
+            <v-content>
+              <v-row justify="center">
+                <v-col align="center">
+                  <h2 class="hidden-sm-and-down">Studenti iscritti</h2>
+                  <h2 class="hidden-md-and-up">Iscritti</h2>
+                </v-col>
+              </v-row>
+              <v-row justify="center">
+                <v-col align="center">
+                  <v-icon size="50">mdi-account-group</v-icon>
+                </v-col>
+              </v-row>
+            </v-content>
           </v-btn>
         </v-col>
         <v-col cols="6" md="3">
-          <v-btn block style="text-transform: none"  @click="inputDialog = true">
-            <span style="white-space: normal">
-              Nuovo admin
-              <v-icon>mdi-account-star</v-icon>
-            </span>
+          <v-btn block style="text-transform: none" @click="inputDialog = true" height="200">
+            <v-content>
+              <v-row justify="center">
+                <v-col align="center">
+                  <h2>Nuovo admin</h2>
+                </v-col>
+              </v-row>
+
+              <v-row justify="center">
+                <v-col align="center">
+                  <v-icon size="50">mdi-account-star</v-icon>
+                </v-col>
+              </v-row>
+            </v-content>
           </v-btn>
         </v-col>
       </v-row>

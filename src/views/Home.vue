@@ -20,7 +20,10 @@
           <v-card-title>
             <v-toolbar color="blue lighten-1" dark flat>
               <h2 v-if="user.isEnrolled">Sei già iscritto</h2>
-              <h1 v-else>Iscriviti al corso</h1>
+              <template v-else>
+              <h1 class="hidden-sm-and-down">Iscriviti al corso</h1>
+              <h1 class="hidden-md-and-up">Iscriviti</h1>
+              </template>
             </v-toolbar>
           </v-card-title>
           <v-card-text>
@@ -51,6 +54,8 @@
         </v-card>
       </v-col>
     </v-row>
+
+
   </div>
 </template>
 <script>
@@ -77,7 +82,8 @@ export default {
       message: "Confermi di voler cancellare la tua iscrizione al corso"
     },
     dateMenu: false,
-    inputRules: [v => pattern.test(v) || "Inserimento non valido"]
+    inputRules: [v => pattern.test(v) || "Inserimento non valido"],
+    modules: []
   }),
 
   created() {

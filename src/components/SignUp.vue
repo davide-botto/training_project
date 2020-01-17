@@ -18,53 +18,55 @@
             </ul>
           </div>
 
-          
-            <v-form ref="form" @submit.prevent="signUp" id="signupForm">
-              <v-row>
-                <v-col>
-                  <v-text-field placeholder="Nome" v-model="name" :rules="[rules.nameSurname]"></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    placeholder="Cognome"
-                    v-model="surname"
-                    :rules="[rules.nameSurname]"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
+          <v-form ref="form" @submit.prevent="signUp" id="signupForm">
+            <v-row>
+              <v-col>
+                <v-text-field
+                  placeholder="Nome"
+                  v-model="name"
+                  :rules="[rules.required, rules.nameSurname]"
+                ></v-text-field>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  placeholder="Cognome"
+                  v-model="surname"
+                  :rules="[rules.required, rules.nameSurname]"
+                ></v-text-field>
+              </v-col>
+            </v-row>
 
-              <v-text-field
-                v-model="email"
-                placeholder="Email"
-                :rules="[rules.required, rules.emailFormat]"
-                prepend-icon="mdi-account"
-              ></v-text-field>
-              <v-text-field
-                v-model="password"
-                placeholder="Scegli password"
-                :rules="[rules.required, rules.content]"
-                type="password"
-                prepend-icon="mdi-lock"
-              ></v-text-field>
-              <!-- Richiedo di ripetere la password e controllo il matching -->
-              <v-text-field
-                v-model="re_password"
-                placeholder="Ripeti password"
-                :rules="[passwordConfirmationRule]"
-                type="password"
-                prepend-icon="mdi-lock"
-              ></v-text-field>
-              <v-btn class="mr-4" color="blue" dark type="submit" form="signupForm">Invia</v-btn>
-            </v-form>
-    
-         
+            <v-text-field
+              v-model="email"
+              placeholder="Email"
+              :rules="[rules.required, rules.emailFormat]"
+              prepend-icon="mdi-account"
+            ></v-text-field>
+            <v-text-field
+              v-model="password"
+              placeholder="Scegli password"
+              :rules="[rules.required, rules.passwordFormat]"
+              type="password"
+              prepend-icon="mdi-lock"
+            ></v-text-field>
+            <!-- Richiedo di ripetere la password e controllo il matching -->
+            <v-text-field
+              v-model="re_password"
+              placeholder="Ripeti password"
+              :rules="[passwordConfirmationRule]"
+              type="password"
+              prepend-icon="mdi-lock"
+            ></v-text-field>
+          </v-form>
         </v-card-text>
+        <v-card-actions>
+          <v-btn class="mr-4" color="blue" dark type="submit" form="signupForm">Invia</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
-    <Snackbar :snackbarProps="snackbarProps" />
     <!-- <v-snackbar v-model="snackbar" top> -->
-      <!-- Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato -->
-      <!-- <v-btn @click.prevent="snackbar = false" dark>Chiudi</v-btn> -->
+    <!-- Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato -->
+    <!-- <v-btn @click.prevent="snackbar = false" dark>Chiudi</v-btn> -->
     <!-- </v-snackbar> -->
   </div>
 </template>
@@ -72,11 +74,9 @@
 <script>
 //import {db} from "@/fb";
 import { auth } from "@/fb";
-import {bus} from "@/main";
-import Snackbar from "./Snackbar";
-
+import { bus } from "@/main";
+import { mapGetters } from "vuex";
 export default {
-  
   data() {
     return {
       dialog: false,
@@ -85,33 +85,10 @@ export default {
       email: "",
       password: "",
       re_password: "",
-      error: null,
-      rules: {
-        nameSurname: v => /^[A-Z][a-zì'àè]+$/.test(v) || "Iniziale maiuscola",
-        emailFormat: v =>
-          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
-            v
-          ) || "Formato email non valido",
-        required: value => !!value || "Campo necessario",
-        /**Regole Password:
-         * almeno 8 simboli
-         * almeno una lettera minuscola
-         * almeno una lettera maiuscola
-         * almeno un numero
-         * almeno un carattere speciale
-         */
-        content: v =>
-          /^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W)(?=.*[^ ]).*$/.test(
-            v
-          ) || "Formato password non valido"
-      },
-      snackbarProps: {
-        message: "Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato",
-        color: ""
-      }
+      error: null
     };
   },
-  
+
   methods: {
     signUp() {
       const promise = auth.createUserWithEmailAndPassword(
@@ -130,24 +107,26 @@ export default {
       // Invio link di verifica email
       promise.then(() => {
         let user = auth.currentUser;
+
         user.sendEmailVerification().then(() => {
           console.log("Email verification");
-         
-          bus.$emit("snackbarMessage");
-
+          bus.$emit("snackbarVerify", {
+            message:
+              "Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato",
+            color: ""
+          });
         });
       });
       promise.catch(err => (this.error = err.message));
-      
     }
   },
   computed: {
+    ...mapGetters({
+      rules: "validateFormRules/rules"
+    }),
     passwordConfirmationRule() {
       return this.password === this.re_password || "Le password non coincidono";
     }
-  },
-  components: {
-    Snackbar
   }
 };
 </script>

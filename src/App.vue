@@ -11,6 +11,7 @@
     
       
     </v-content>
+    <Snackbar />
   </v-app>
 </template>
 
@@ -18,12 +19,14 @@
 import { mapGetters } from "vuex";
 import {bus} from "@/main";
 import Loading from "@/components/Loading.vue"
+import Snackbar from "@/components/Snackbar";
 
 export default {
   name: "App",
 
   components: {
-    Loading
+    Loading,
+    Snackbar
   },
 
   data: () => ({

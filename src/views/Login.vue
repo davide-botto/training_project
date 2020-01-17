@@ -28,7 +28,7 @@
                     <v-text-field
                       v-model="password"
                       placeholder="Password"
-                      :rules="[rules.required]"
+                      :rules="[rules.required, rules.passwordFormat]"
                       prepend-icon="mdi-lock"
                       type="password"
                     ></v-text-field>
@@ -41,7 +41,7 @@
                         <v-btn block color="blue" dark form="login-form" type="submit">LOGIN</v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <SignUp/>
+                        <SignUp />
                       </v-col>
                       <v-col cols="12">
                         <v-btn block @click="inputDialog = true">Hai dimenticato la password?</v-btn>
@@ -56,6 +56,7 @@
       </v-container>
     </v-content>
 
+    <!-- Form di reset password -->
     <v-dialog v-model="inputDialog" max-width="400px">
       <v-card class="d-flex justify center">
         <v-card-title>
@@ -64,7 +65,7 @@
           <v-card-text>
             <p>Inserisci il tuo indirizzo email</p>
             <v-form ref="form">
-              <v-text-field v-model="email" placeholder="Email"></v-text-field>
+              <v-text-field v-model="resetEmail" placeholder="Email" :rules="[rules.required, rules.emailFormat]"></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -73,44 +74,27 @@
         </v-card-title>
       </v-card>
     </v-dialog>
-    <Snackbar :snackbarProps="snackbarProps" />
-    <resendEmail :dialogProps="dialogProps" />
-    </v-app>
+    <resendEmail />
+  </v-app>
   <!-- </div> -->
 </template>
 
 <script>
 import { auth } from "@/fb";
-import {bus} from "@/main";
+import { bus } from "@/main";
 import SignUp from "../components/SignUp";
 import TopBar from "../components/TopBar";
-import Snackbar from "../components/Snackbar";
 import resendEmail from "../components/resendEmail";
 import { mapGetters } from "vuex";
 
 export default {
   data() {
     return {
-      snackbarProps: {
-        message: "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato",
-        color: ""
-      },
-      dialogProps: {
-        title: "Email non verificata",
-        message: "Controlla nella spam, altrimenti reinvia una mail di verifica."
-      },
       email: "",
+      resetEmail: "",
       password: "",
       error: null,
       inputDialog: false,
-      rules: {
-        emailFormat: v =>
-          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
-            v
-          ) || "Formato email non valido",
-        required: value => !!value || "Campo necessario"
-      },
-      
     };
   },
   methods: {
@@ -144,46 +128,77 @@ export default {
             } */
             } else {
               this.error = "Email non verificata";
-              console.log(this.error)
-              bus.$emit("openResendPopup");
+              console.log(this.error);
+              bus.$emit("openResendEmail", {
+                title: "Email non verificata",
+                message:
+                  "Controlla nella spam, altrimenti reinvia una mail di verifica."
+              });
             }
           }
         })
-        .catch(err => (this.error = err.message));
+        .catch(err => {
+          let errorCode = err.code;
+          switch (errorCode) {
+            case 'auth/invalid-email':
+              this.error = "Indirizzo email non valido";
+              break;
+            case 'auth/user-not-found':
+              this.error = "Non è stato trovato un utente corrispondente a questo indirizzo email";
+              break;
+            case 'auth/user-disabled':
+              this.error = "L'utente corrispondente a questo indirizzo email è stato disabilitato";
+              break;
+            case 'auth/wrong-password':
+              this.error = "Password errata";
+              break;
+            
+
+          }
+        }
+        );
     },
     resetPassword() {
-      auth.languageCode = "it";
+      // Il backend invia una mail con un link di reset
       auth
-        .sendPasswordResetEmail(this.email)
+        .sendPasswordResetEmail(this.resetEmail)
         .then(() => {
-          bus.$emit("snackbarMessage");
+          console.log("Emit");
+          // Mostro uno snackbar con un messaggio
+          bus.$emit("snackbarResetPass", {
+            message:
+              "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato",
+            color: ""
+          });
           this.inputDialog = false;
           this.$refs.form.reset();
         })
-        .catch(err => (this.error = err.message));
+        .catch(err => {
+          console.log(err.message);
+          this.error = "Errore: ripeti la richiesta di reset password."});
     }
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-        courseTitle: true,
-        coursePage: false,
-        students: false,
-        profile: false,
-        toHome: false,
-        exit: false
-      })
+      courseTitle: true,
+      coursePage: false,
+      students: false,
+      profile: false,
+      toHome: false,
+      exit: false
+    });
   },
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
       user: "authentication/user",
-      barprop: "topbar/barprop"
+      barprop: "topbar/barprop",
+      rules: "validateFormRules/rules"
     })
   },
   components: {
     TopBar,
     SignUp,
-    Snackbar,
     resendEmail
   }
 };
