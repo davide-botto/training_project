@@ -4,7 +4,7 @@
 
     <v-card>
       <v-toolbar dark :color="options.color" dense flat>
-        <v-toolbar-title>{{dialogContent.title}}</v-toolbar-title>
+        <v-toolbar-title>{{payload.title}}</v-toolbar-title>
       </v-toolbar>
       <v-card-text class="pa-4">
         {{dialogMessage}}
@@ -12,7 +12,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary darken-1" text @click="removeStudent(student.id)">Ok</v-btn>
+        <v-btn color="primary darken-1" text @click="removeStudent(payload.student.id)">Ok</v-btn>
         <v-btn color="grey" text @click="cancel">Annulla</v-btn>
       </v-card-actions>
     </v-card>
@@ -21,21 +21,18 @@
 
 <script>
 import { db } from "@/fb";
-import {bus} from "@/main";
+import { bus } from "@/main";
 export default {
   props: {
     student: {
       type: Object
     },
-    dialogContent: {
-      type: Object
-    }
   },
-
   data() {
     return {
       dialog: false,
       error: null,
+      payload: {},       
       options: {
         color: "primary",
         width: 290,
@@ -44,9 +41,10 @@ export default {
     };
   },
   created() {
-    bus.$on("openPopup", () => {
-      console.log("Evento open popup")
-      this.dialog = true
+    bus.$on("openDialogConfirm", payload => {
+      console.log("Evento open popup");
+      this.payload = payload;
+      this.dialog = true;
     });
   },
   methods: {
@@ -61,24 +59,26 @@ export default {
           console.log("Student deleted from db", arg);
           // Dopo la cancellazione setto la proprietà "isEnrolled a false"
           this.$store.dispatch("authentication/act_SET_ENROLLED", false);
-          this.dialog=false;
-        }).catch(() => this.error = "Cancellazione non riuscita");
-    },
+          this.dialog = false;
+        })
+        .catch(() => (this.error = "Cancellazione non riuscita"));
+    }
   },
   computed: {
     dialogMessage() {
       let string;
-      if (this.student.name) {
-        string = this.dialogContent.message +
-        " " +
-        this.student.surname +
-        " " +
-        this.student.name
-        
-      } else {
-        string = this.dialogContent.message
-      }
       
+      if (this.student.name) {
+        string =
+          this.payload.message +
+          " " +
+          this.student.surname +
+          " " +
+          this.student.name;
+      } else {
+        string = this.payload.message;
+      }
+
       return string + "?";
     }
   }

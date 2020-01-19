@@ -46,11 +46,11 @@
               </v-menu>
             </v-form>
             <v-card-actions>
-              <v-btn v-if="user.isEnrolled" @click="triggerPopup">Cancella iscrizione</v-btn>
+              <v-btn v-if="user.isEnrolled" @click="triggerPopup(student)">Cancella iscrizione</v-btn>
               <v-btn v-else @click="enrollStudent">Invia</v-btn>
             </v-card-actions>
           </v-card-text>
-          <DialogConfirm :student="student" :dialogContent="dialogContent"/>
+          <DialogConfirm :student="student"/>
         </v-card>
       </v-col>
     </v-row>
@@ -66,7 +66,7 @@ import { db } from "@/fb";
 import { auth } from "@/fb";
 import { bus } from "@/main";
 
-let pattern = /^[a-zì'àè]+$/i;
+
 
 export default {
   data: vm => ({
@@ -77,21 +77,13 @@ export default {
           
       id: auth.currentUser.uid
     },
-    dialogContent: {
-      title: "Cancella iscrizione",
-      message: "Confermi di voler cancellare la tua iscrizione al corso"
-    },
     dateMenu: false,
-    inputRules: [v => pattern.test(v) || "Inserimento non valido"],
     modules: []
   }),
 
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      courseTitle: true,
-      coursePage: false,
-      students: false,
-      profile: false,
+      title: {title1: "Corso di programmazione web", title2: "Sviluppo web"},
       toHome: false,
       exit: true
     });
@@ -152,7 +144,11 @@ export default {
     },
     
     triggerPopup() {
-      bus.$emit("openPopup");
+      bus.$emit("openDialogConfirm", {
+      title: "Cancella iscrizione",
+      message: "Confermi di voler cancellare la tua iscrizione al corso",
+    
+    });
     }
   }
 };

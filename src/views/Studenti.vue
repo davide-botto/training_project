@@ -10,10 +10,11 @@
           <v-card>Nome</v-card>
         </v-col>
         <v-col align="center">
-          <v-card>Data di nascita</v-card>
+          <v-card class="hidden-sm-and-down">Data di nascita</v-card>
+          <v-card class="hidden-md-and-up">Nascita</v-card>
         </v-col>
       </v-row>
-      <v-card v-for="student in students" :key="student.id">
+      <v-card v-for="student in students" :key="student.id" v-on:click.native="prova">
         <v-row>
           <v-col align="center">
             {{student.surname}}
@@ -21,23 +22,24 @@
           </v-col>
 
           <v-col align="center">{{student.name}}</v-col>
-          <v-col align="center">{{student.birthDate}}</v-col>
+          <v-col align="center" class="hidden-sm-and-down">{{formatDate(student.birthDate,false)}}</v-col>
+          <v-col align="center" class="hidden-md-and-up">{{formatDate(student.birthDate,true)}}</v-col>
         </v-row>
         <!-- Mostro i buttons di modifica e cancellazione solo se l'utente è admin -->
         <div v-show="user.loggedIn && user.isAdmin" id="handle-student">
           <v-btn
-        class="px-2 grey lighten-2"
-        min-width="0"
-        max-width="20px"
-        max-height="20px"
-        @click="triggerPopup"
-      >x</v-btn>
-         <DialogConfirm :student="student" :dialogContent="dialogContent"/>
+            class="px-1 grey lighten-2 hidden-sm-and-down"
+            min-width="0"
+            max-width="18px"
+            max-height="18px"
+            @click="triggerPopup()"
+          >x</v-btn>
+
+          <DialogConfirm :student="student" />
         </div>
         <v-divider></v-divider>
       </v-card>
     </v-container>
-    
   </div>
 </template>
 
@@ -47,40 +49,49 @@ import TopBar from "../components/TopBar";
 import DialogConfirm from "../components/DialogConfirm";
 import { mapGetters } from "vuex";
 import { db } from "@/fb";
-import {bus} from "@/main";
+import { bus } from "@/main";
 
 export default {
   name: "home",
   data() {
     return {
       students: [],
-      showMenu: false,
-      
-      // Contenuti da passare al componente DialogConfirm
-      dialogContent: {
-        title: "Cancellazione studente",
-        message: "Confermi di voler cancellare lo studente"
-      }
+      showMenu: false
     };
   },
   methods: {
-    formatDate(date) {
+    formatDate(date, short) {
       if (!date) return null;
       const [year, month, day] = date.split("-");
-      return `${day}-${month}-${year}`;
+      let result;
+      if (short) {
+        let yearShort = year[2] + year[3];
+        result = `${day}-${month}-${yearShort}`;
+      } else {
+        result = `${day}-${month}-${year}`;
+      }
+      return result;
     },
     sortBy: function(prop) {
       if (prop === "Cognome") {
         this.students.sort((a, b) => (a[prop] < b[prop] ? -1 : 1));
       }
     },
-    
+
     show: function(event) {
       event.preventDefault;
       this.showMenu = true;
     },
     triggerPopup() {
-      bus.$emit("openPopup");
+      bus.$emit("openDialogConfirm", {
+        title: "Cancellazione studente",
+        message: "Confermi di voler cancellare lo studente"
+      });
+    },
+    prova() {
+      if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
+        this.triggerPopup();
+      }
     }
   },
 
@@ -129,10 +140,7 @@ export default {
     );
 
     this.$store.dispatch("topbar/act_setBar", {
-      courseTitle: false,
-      coursePage: false,
-      students: true,
-      profile: false,
+      title: { title1: "Studenti iscritti", title2: "Iscritti" },
       toHome: true,
       exit: true
     });
@@ -147,7 +155,7 @@ export default {
 <style scoped>
 #handle-student {
   position: absolute;
-  top: 2px;
-  right: 4px;
+  top: -4px;
+  right: 0px;
 }
 </style>

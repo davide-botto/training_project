@@ -48,10 +48,7 @@ export default {
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      courseTitle: false,
-      coursePage: false,
-      students: false,
-      profile: true,
+      title: "Profilo studente",
       toHome: true,
       exit: true
     });

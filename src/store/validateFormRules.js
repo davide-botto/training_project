@@ -5,7 +5,7 @@ export const validateFormRules = {
     state: {
         rules: {
             required: value => !!value || "Campo necessario",
-            nameSurname: v => /^[A-Z][a-zì'àè]+$/.test(v) || "Non valido",
+            nameSurname: v => /^[A-Z][a-zì'àèéòù]+$/.test(v) || "Non valido",
             emailFormat: v =>
                 /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
                     v

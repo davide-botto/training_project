@@ -25,7 +25,7 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="submit">Invia</v-btn>
+        <v-btn @click="submit" outlined color="blue">Invia</v-btn>
       </v-card-actions>
     </v-card>
     <Snackbar :snackbarProps="snackbarProps" />

@@ -65,7 +65,11 @@
           <v-card-text>
             <p>Inserisci il tuo indirizzo email</p>
             <v-form ref="form">
-              <v-text-field v-model="resetEmail" placeholder="Email" :rules="[rules.required, rules.emailFormat]"></v-text-field>
+              <v-text-field
+                v-model="resetEmail"
+                placeholder="Email"
+                :rules="[rules.required, rules.emailFormat]"
+              ></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -94,7 +98,7 @@ export default {
       resetEmail: "",
       password: "",
       error: null,
-      inputDialog: false,
+      inputDialog: false
     };
   },
   methods: {
@@ -106,26 +110,8 @@ export default {
           if (user) {
             console.log(user.user.emailVerified);
             if (user.user.emailVerified) {
-              console.log("Email verified");
-              /*this.$store
-                .dispatch("authentication/set_isVerified", user.user)
-                .then(() => {
-                  // Se l'email è verificata, controllo la presenza di custom claims
-                  user.user.getIdTokenResult().then(IdTokenResult => {
-                    let admin = IdTokenResult.claims.admin;
-                    // Scrivo il claim admin su store
-                    this.$store
-                      .dispatch("authentication/set_admin", admin)
-                      .then(() => {
-                        console.log("Prova");
-                        this.$router
-                          .replace({ name: "home" }).catch(() => {console.log("Errore router")})
-                        
-                      }).catch((err) => console.log(err.message));
-                  });
-                })
-                .catch(err => console.log(err.message));
-            } */
+              console.log("Email verificata");
+              
             } else {
               this.error = "Email non verificata";
               console.log(this.error);
@@ -138,25 +124,26 @@ export default {
           }
         })
         .catch(err => {
+
+          // Gestisco gli errori di login
           let errorCode = err.code;
           switch (errorCode) {
-            case 'auth/invalid-email':
+            case "auth/invalid-email":
               this.error = "Indirizzo email non valido";
               break;
-            case 'auth/user-not-found':
-              this.error = "Non è stato trovato un utente corrispondente a questo indirizzo email";
+            case "auth/user-not-found":
+              this.error =
+                "Non è stato trovato un utente corrispondente a questo indirizzo email";
               break;
-            case 'auth/user-disabled':
-              this.error = "L'utente corrispondente a questo indirizzo email è stato disabilitato";
+            case "auth/user-disabled":
+              this.error =
+                "L'utente corrispondente a questo indirizzo email è stato disabilitato";
               break;
-            case 'auth/wrong-password':
+            case "auth/wrong-password":
               this.error = "Password errata";
               break;
-            
-
           }
-        }
-        );
+        });
     },
     resetPassword() {
       // Il backend invia una mail con un link di reset
@@ -175,15 +162,13 @@ export default {
         })
         .catch(err => {
           console.log(err.message);
-          this.error = "Errore: ripeti la richiesta di reset password."});
+          this.error = "Errore: ripeti la richiesta di reset password.";
+        });
     }
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      courseTitle: true,
-      coursePage: false,
-      students: false,
-      profile: false,
+      title: {title1: "Corso di programmazione web", title2: "Sviluppo web"},
       toHome: false,
       exit: false
     });

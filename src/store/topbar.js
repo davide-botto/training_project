@@ -20,10 +20,7 @@ export const topbar = {
     actions: {
         act_setBar({ commit }, bar) {
             commit("mut_SET_BAR", {
-                courseTitle: bar.courseTitle,
-                coursePage: bar.coursePage,
-                students: bar.students,
-                profile: bar.profile,
+                barTitle: bar.title,
                 toHome: bar.toHome,
                 exit: bar.exit
             })

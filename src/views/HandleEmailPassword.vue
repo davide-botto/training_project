@@ -37,7 +37,7 @@
               </v-form>
             </v-card-text>
             <v-card-actions>
-              <v-btn type="submit" form="resetPasswordForm">Invia</v-btn>
+              <v-btn type="submit" form="resetPasswordForm" outlined color="blue">Invia</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>

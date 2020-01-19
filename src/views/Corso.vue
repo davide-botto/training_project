@@ -26,6 +26,20 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card>
+            <v-card-title>Programma</v-card-title>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Creo una card per ogni document della raccolta "modules" e visualizzo il programma -->
+        <v-card v-for="unit in units" :key="unit.id">
+          <v-card-title>{{unit.title}}</v-card-title>
+          <v-card-text>{{unit.description}}</v-card-text>
+        </v-card>
+      
     </v-container>
   </div>
 </template>
@@ -37,18 +51,16 @@ import { db } from "@/fb";
 export default {
   data() {
     return {
-      students: []
+      students: [],
+      units: []
     };
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-        courseTitle: false,
-        coursePage: true,
-        students: false,
-        profile: false,
-        toHome: true,
-        exit: true
-      })
+      title: { title1: "Pagina del corso", title2: this.title1 },
+      toHome: true,
+      exit: true
+    });
 
     db.collection("students").onSnapshot(res => {
       const changes = res.docChanges();
@@ -65,6 +77,21 @@ export default {
         err => console.log(err.message)
       );
     });
+
+    db.collection("modules").onSnapshot(
+      res => {
+        const changes = res.docChanges();
+        changes.forEach(change => {
+          if (change.type == "added") {
+            this.units.push({
+              ...change.doc.data(),
+              id: change.doc.id
+            });
+          }
+        });
+      },
+      err => console.log(err.message)
+    );
   },
 
   components: {

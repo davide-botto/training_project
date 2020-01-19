@@ -32,6 +32,7 @@ auth.onAuthStateChanged(user => {
           store.dispatch("authentication/act_SET_ENROLLED", doc.exists);
         }).catch(err => console.log(err.message));
         
+        // I profili normal user e admin hanno due home differenti
         if (user.admin) {
           router.replace({ name: "adminPanel" }).catch(err => console.log(err.message));
         } else {
@@ -43,8 +44,7 @@ auth.onAuthStateChanged(user => {
 
 
     } else {
-      // Se l'email non è verificata, invio un link di verifica
-      console.log("Email non verificata");
+        console.log("Email non verificata");
       
     }
   }

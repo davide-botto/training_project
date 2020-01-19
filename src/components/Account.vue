@@ -7,7 +7,7 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item @click.stop="outputDialog=true">Account</v-list-item>
+        <!-- <v-list-item @click.stop="outputDialog=true">Account</v-list-item> -->
         <v-list-item @click="toChangePassword">Cambio password</v-list-item>
 
         <v-list-item @click="logout">Esci</v-list-item>

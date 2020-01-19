@@ -3,37 +3,30 @@
   <div class="home">
     <TopBar />
     <v-container>
-      <v-row>
+      <!-- <v-content> -->
+      <v-row align="center">
         <v-col cols="12" md="6">
-          <v-card height="200">
-            <v-row>
-              <v-col class="ml-2">
-                <h3>Account admin</h3>
-              </v-col>
+          <v-card class="mx-auto" height="200">
+            <v-row class="ml-1" align="start">
+              <v-col style="font-variant: small-caps">Account admin</v-col>
             </v-row>
-
-            <v-row align="center">
-              <v-col cols="5" md="3" align="center">
-                <v-avatar size="90">
+            <v-row>
+              <v-col align="center" cols="5" sm="4">
+                <v-avatar size="85">
                   <img src="https://www.svgrepo.com/show/34094/teacher.svg" alt="Ising" />
                 </v-avatar>
               </v-col>
-              <v-col cols="6" md="6">
+              <v-col>
                 <v-row>
-                  <v-col>
-                    <h2>{{user.data.displayName}}</h2>
-                  </v-col>
+                  <h2>{{user.data.displayName}}</h2>
                 </v-row>
-                <v-row class="hidden-sm-and-down">
-                  <v-col>{{user.data.email}}</v-col>
-                </v-row>
+                <v-row class="hidden-sm-and-down">{{user.data.email}}</v-row>
               </v-col>
             </v-row>
+            <v-row justify="center" class="hidden-md-and-up">{{user.data.email}}</v-row>
           </v-card>
-          <v-row class="hidden-md-and-up">
-            <v-col cols="12" align="center">{{user.data.email}}</v-col>
-          </v-row>
         </v-col>
+
         <v-col cols="6" md="3">
           <v-btn block router to="/studenti" style="text-transform: none" height="200">
             <v-content>
@@ -69,18 +62,26 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-row align="center">
+        <v-col cols="12" md="6">
+          <v-btn block style="text-transform: none" to="/courseProgram" height="100">
+          <h3>Programma del corso</h3>
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-container>
 
     <!-- Dialog di inserimento email utente da rendere admin -->
 
-    <v-dialog v-model="inputDialog" max-width="400px">
+    <v-dialog v-model="inputDialog">
       <v-card>
         <v-card-title>
-          <h3>Rendi un utente amministratore</h3>
+          <h3 class="hidden-sm-and-down">Rendi un utente amministratore</h3>
+          <h3 class="hidden-md-and-up">Rendi un utente<br />amministratore</h3>
           <div v-show="error" class="red--text">{{ error }}</div>
           <v-card-text>
             <v-form ref="form">
-              <v-text-field v-model="adminEmail" placeholder="Email utente"></v-text-field>
+              <v-text-field v-model="adminEmail" placeholder="Email utente" :rules="[rules.emailFormat]"></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -107,10 +108,7 @@ export default {
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      courseTitle: true,
-      coursePage: false,
-      students: false,
-      profile: false,
+      title: {title1: "Corso di programmazione web", title2: "Sviluppo web"},
       toHome: false,
       exit: true
     });
@@ -133,7 +131,8 @@ export default {
   computed: {
     ...mapGetters({
       user: "authentication/user",
-      barprop: "topbar/barprop"
+      barprop: "topbar/barprop",
+      rules: "validateFormRules/rules"
     })
   },
   components: {

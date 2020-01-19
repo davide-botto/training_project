@@ -64,15 +64,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- <v-snackbar v-model="snackbar" top> -->
-    <!-- Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato -->
-    <!-- <v-btn @click.prevent="snackbar = false" dark>Chiudi</v-btn> -->
-    <!-- </v-snackbar> -->
+    
   </div>
 </template>
 
 <script>
-//import {db} from "@/fb";
 import { auth } from "@/fb";
 import { bus } from "@/main";
 import { mapGetters } from "vuex";
