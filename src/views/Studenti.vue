@@ -14,7 +14,7 @@
           <v-card class="hidden-md-and-up">Nascita</v-card>
         </v-col>
       </v-row>
-      <v-card v-for="student in students" :key="student.id" v-touch:tap="mobileEvent">
+      <v-card v-for="student in students" :key="student.id" v-on:click.native="prova">
         <v-row>
           <v-col align="center">
             {{student.surname}}
@@ -88,8 +88,7 @@ export default {
         message: "Confermi di voler cancellare lo studente"
       });
     },
-    mobileEvent() {
-      // Se l'evento touch è stato scatenato su uno smartphone, apro il dialog di conferma
+    prova() {
       if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
         this.triggerPopup();
       }
