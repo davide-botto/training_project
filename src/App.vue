@@ -35,7 +35,8 @@ export default {
   
   computed: {
     ...mapGetters({
-      user: "authentication/user"
+      user: "authentication/user",
+      
     })
   },
   mounted() {
