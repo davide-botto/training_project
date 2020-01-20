@@ -48,7 +48,7 @@ export default {
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      title: "Profilo studente",
+      title: {title1: "Profilo studente", title2: "Profilo"},
       toHome: true,
       exit: true
     });

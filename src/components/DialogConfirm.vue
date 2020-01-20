@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" :max-width="options.width" @keydown.esc="cancel">
+  <v-dialog v-model="dialog" :max-width="options.width" @keydown.esc="cancel" persistent>
     <!-- Il dialog di conferma viene aperto all'evento "openPopup" emesso dal bus -->
 
     <v-card>

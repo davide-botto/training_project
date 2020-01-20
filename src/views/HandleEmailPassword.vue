@@ -62,7 +62,6 @@
       <v-card-text class="text-center red--text">
         <h2>{{error}}</h2>
       </v-card-text>
-      
     </v-card>
     <!-- Se la verifica email ha dato errore, mostro un dialog che consente di reinviare il link -->
     <resendEmail />
@@ -88,8 +87,7 @@ export default {
       title: "",
       email: "",
       newPassword: "",
-      re_newPassword: "",
-      
+      re_newPassword: ""
     };
   },
   created() {
@@ -145,6 +143,8 @@ export default {
                 color: "success"
               });
               this.$refs.form.reset();
+              
+              
             })
             .catch(err => {
               // Errore in confirmPasswordReset: mostro un messaggio in card
@@ -182,17 +182,18 @@ export default {
         });
     },
     submitResetRequest() {
-      this.handleResetPassword(this.actionCode, this.newPassword);
-    },
-    
-  
+      // Procedo solo se sono rispettate le regole di validazione
+      if (this.$refs.form.validate()) {
+        this.handleResetPassword(this.actionCode, this.newPassword);
+      }
+    }
   },
   computed: {
     ...mapGetters({
       // map `this.user` to `this.$store.getters.user`
       rules: "validateFormRules/rules"
     }),
-    
+
     passwordConfirmationRule() {
       // Verifico che le password nei campi "Nuova password" e "Ripeti coincidano"
       return (

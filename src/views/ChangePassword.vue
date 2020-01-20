@@ -8,8 +8,13 @@
     </v-app-bar>
     <v-card>
       <v-card-text>
-        <v-form id="changePasswordForm">
-          <v-text-field v-model="currentPassword" placeholder="Vecchia password" type="password" :rules="[rules.required, rules.passwordFormat]"></v-text-field>
+        <v-form id="changePasswordForm" ref="form">
+          <v-text-field
+            v-model="currentPassword"
+            placeholder="Vecchia password"
+            type="password"
+            :rules="[rules.required, rules.passwordFormat]"
+          ></v-text-field>
           <v-text-field
             v-model="newPassword"
             placeholder="Nuova password"
@@ -53,25 +58,28 @@ export default {
   },
   methods: {
     submit() {
-      let user = firebase.auth().currentUser;
-      let credential = firebase.auth.EmailAuthProvider.credential(
-        user.email,
-        this.currentPassword
-      );
-      user
-        .reauthenticateWithCredential(credential)
-        .then(() => {
-          console.log("Password corrente verificata");
-          // Se la password corrente è corretta, la aggiorno con quella nuova
-          user
-            .updatePassword(this.newPassword)
-            .then(() => {
-              console.log("Password modificata con successo");
-              bus.$emit("snackbarMessage");
-            })
-            .catch(err => console.log(err.message));
-        })
-        .catch(err => console.log(err.message));
+      // Consento il submit solo se sono rispettate le regole di validazione del form
+      if (this.$refs.form.validate()) {
+        let user = firebase.auth().currentUser;
+        let credential = firebase.auth.EmailAuthProvider.credential(
+          user.email,
+          this.currentPassword
+        );
+        user
+          .reauthenticateWithCredential(credential)
+          .then(() => {
+            console.log("Password corrente verificata");
+            // Se la password corrente è corretta, la aggiorno con quella nuova
+            user
+              .updatePassword(this.newPassword)
+              .then(() => {
+                console.log("Password modificata con successo");
+                bus.$emit("snackbarMessage");
+              })
+              .catch(err => console.log(err.message));
+          })
+          .catch(err => console.log(err.message));
+      }
     }
   },
   computed: {

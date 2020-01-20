@@ -10,7 +10,8 @@ export default new Vuex.Store({
     modules: {
         authentication,
         topbar,
-        validateFormRules
+        validateFormRules,
+        
     }
 });
 
