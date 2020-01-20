@@ -11,8 +11,7 @@
         <span>Profilo studente</span>
       </v-btn>
     </v-bottom-navigation>
-    <div class="success--text" align="center">{{user}}</div>
-
+    
     <!-- Form di iscrizione -->
     <v-row justify="center">
       <v-col cols="12" md="8">

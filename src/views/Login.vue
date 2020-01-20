@@ -3,7 +3,7 @@
   <v-app id="inspire">
     <TopBar />
     <v-content>
-      <v-container class="fill-height" fluid>
+      <v-container class="fill-height bg" fluid>
         <v-row align="center" justify="center" no-gutters>
           <v-col>
             <v-row align="center" justify="center">
@@ -188,3 +188,11 @@ export default {
   }
 };
 </script>
+<style scoped>
+/* Carico un'immagine di sfondo sulla schermata di login */
+.bg {
+  background: url("https://www.robotlab.com/hs-fs/hubfs/Code-on-Computer-Hero.gif?width=1200&name=Code-on-Computer-Hero.gif")
+    no-repeat center center;
+  background-size: cover;
+}
+</style>

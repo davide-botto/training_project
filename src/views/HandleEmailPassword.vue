@@ -39,6 +39,8 @@
             <v-card-actions>
               <v-btn type="submit" form="resetPasswordForm" outlined color="blue">Invia</v-btn>
             </v-card-actions>
+            <!-- Se il reset password va a buon fine, mostro il link per tornare alla pagina di login -->
+            <a v-if="show" href="http://localhost:8080/">Torna al login</a>  
           </v-card>
         </v-col>
       </v-row>
@@ -89,7 +91,7 @@ export default {
       email: "",
       newPassword: "",
       re_newPassword: "",
-      
+      show: false,
     };
   },
   created() {
@@ -145,6 +147,8 @@ export default {
                 color: "success"
               });
               this.$refs.form.reset();
+              // Mostro il link per tornare alla pagina di login
+              this.show = true;
             })
             .catch(err => {
               // Errore in confirmPasswordReset: mostro un messaggio in card

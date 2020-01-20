@@ -51,8 +51,8 @@
                   small
                   outlined
                   color="blue"
-                  v-if="index == units.length-1"
-                  @click="addUnit"
+                  v-if="index == units.length - 1"
+                  @click="addUnit(index)"
                   v-on="on"
                 >
                   <v-icon>mdi-card-plus</v-icon>
@@ -80,12 +80,13 @@ export default {
       editMode: false,
       units: [],
       editing: "",
+      indexToAdd: 0,
       showTooltip: false
     };
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      title: {title1: "Programma del corso", title2: "Programma"},
+      title: { title1: "Programma del corso", title2: "Programma" },
       toHome: true,
       exit: true
     });
@@ -95,10 +96,19 @@ export default {
         const changes = res.docChanges();
         changes.forEach(change => {
           if (change.type == "added") {
-            this.units.push({
+            console.log(this.editing);
+            if (this.indexToAdd == 0) {
+              this.units.push({
+                ...change.doc.data(),
+                id: change.doc.id
+              });
+            } else {
+              console.log("Prova: " + this.indexToAdd);
+            }
+            /*this.units.splice(this.units.indexOf(item, 0),0,{
               ...change.doc.data(),
               id: change.doc.id
-            });
+            })*/
           } else if (change.type == "removed") {
             let item = this.units.find(el => el.id == change.doc.id);
             this.units.splice(this.units.indexOf(item, 0), 1);
@@ -116,14 +126,16 @@ export default {
   },
 
   methods: {
-    addUnit() {
-      db.collection("modules")
+    addUnit(index) {
+      db.collection("prova")
         .add({
           title: "Nuovo modulo",
           description: "Inserisci descrizione"
         })
         .then(() => {
           console.log("Editable module added to db");
+                   
+          this.editing = index + 1;
           this.editMode = true;
         })
         .catch(err => console.log(err.message));
