@@ -64,7 +64,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    
   </div>
 </template>
 
@@ -87,33 +86,35 @@ export default {
 
   methods: {
     signUp() {
-      const promise = auth.createUserWithEmailAndPassword(
-        this.email,
-        this.password
-      );
-      promise.then(data => {
-        data.user.updateProfile({
-          displayName: this.name + " " + this.surname
+      if (this.$refs.form.validate()) {
+        const promise = auth.createUserWithEmailAndPassword(
+          this.email,
+          this.password
+        );
+        promise.then(data => {
+          data.user.updateProfile({
+            displayName: this.name + " " + this.surname
+          });
+          this.dialog = false;
+          this.$refs.form.reset();
+          this.error = null;
         });
-        this.dialog = false;
-        this.$refs.form.reset();
-        this.error = null;
-      });
 
-      // Invio link di verifica email
-      promise.then(() => {
-        let user = auth.currentUser;
+        // Invio link di verifica email
+        promise.then(() => {
+          let user = auth.currentUser;
 
-        user.sendEmailVerification().then(() => {
-          console.log("Email verification");
-          bus.$emit("snackbarVerify", {
-            message:
-              "Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato",
-            color: ""
+          user.sendEmailVerification().then(() => {
+            console.log("Email verification");
+            bus.$emit("snackbarVerify", {
+              message:
+                "Controlla la tua email. Abbiamo inviato un link di verifica all'indirizzo specificato",
+              color: ""
+            });
           });
         });
-      });
-      promise.catch(err => (this.error = err.message));
+        promise.catch(err => (this.error = err.message));
+      }
     }
   },
   computed: {

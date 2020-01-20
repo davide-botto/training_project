@@ -3,7 +3,8 @@
   <v-app id="inspire">
     <TopBar />
     <v-content>
-      <v-container class="fill-height" fluid>
+      <v-container class="fill-height bg" fluid>
+        <!-- <v-img src="https://datacode.it/img/frontoffice/web-development2.jpg" position="center"></v-img> -->
         <v-row align="center" justify="center" no-gutters>
           <v-col>
             <v-row align="center" justify="center">
@@ -64,7 +65,7 @@
           <div v-show="error" class="red--text">{{ error }}</div>
           <v-card-text>
             <p>Inserisci il tuo indirizzo email</p>
-            <v-form ref="form">
+            <v-form ref="form" id="resetPasswordForm" @submit.prevent="resetPassword">
               <v-text-field
                 v-model="resetEmail"
                 placeholder="Email"
@@ -73,7 +74,7 @@
             </v-form>
           </v-card-text>
           <v-card-actions>
-            <v-btn class="success" dark @click="resetPassword">Invia</v-btn>
+            <v-btn class="success" dark @click="resetPassword" form="resetPasswordForm">Invia</v-btn>
           </v-card-actions>
         </v-card-title>
       </v-card>
@@ -103,72 +104,78 @@ export default {
   },
   methods: {
     login() {
-      this.$store.dispatch("authentication/act_triggerMessage", false);
-      auth
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then(user => {
-          if (user) {
-            console.log(user.user.emailVerified);
-            if (user.user.emailVerified) {
-              console.log("Email verificata");
-              
-            } else {
-              this.error = "Email non verificata";
-              console.log(this.error);
-              bus.$emit("openResendEmail", {
-                title: "Email non verificata",
-                message:
-                  "Controlla nella spam, altrimenti reinvia una mail di verifica."
-              });
+      // Invio il form di login solo se sono rispettate le regole di validazione
+      if (this.$refs.form.validate()) {
+        console.log("prova");
+        this.$store.dispatch("authentication/act_triggerMessage", false);
+        auth
+          .signInWithEmailAndPassword(this.email, this.password)
+          .then(user => {
+            if (user) {
+              console.log(user.user.emailVerified);
+              if (user.user.emailVerified) {
+                console.log("Email verificata");
+              } else {
+                this.error = "Email non verificata";
+                console.log(this.error);
+                bus.$emit("openResendEmail", {
+                  title: "Email non verificata",
+                  message:
+                    "Controlla nella spam, altrimenti reinvia una mail di verifica."
+                });
+              }
             }
-          }
-        })
-        .catch(err => {
-
-          // Gestisco gli errori di login
-          let errorCode = err.code;
-          switch (errorCode) {
-            case "auth/invalid-email":
-              this.error = "Indirizzo email non valido";
-              break;
-            case "auth/user-not-found":
-              this.error =
-                "Non è stato trovato un utente corrispondente a questo indirizzo email";
-              break;
-            case "auth/user-disabled":
-              this.error =
-                "L'utente corrispondente a questo indirizzo email è stato disabilitato";
-              break;
-            case "auth/wrong-password":
-              this.error = "Password errata";
-              break;
-          }
-        });
+          })
+          .catch(err => {
+            // Gestisco gli errori di login
+            let errorCode = err.code;
+            switch (errorCode) {
+              case "auth/invalid-email":
+                this.error = "Indirizzo email non valido";
+                break;
+              case "auth/user-not-found":
+                this.error =
+                  "Non è stato trovato un utente corrispondente a questo indirizzo email";
+                break;
+              case "auth/user-disabled":
+                this.error =
+                  "L'utente corrispondente a questo indirizzo email è stato disabilitato";
+                break;
+              case "auth/wrong-password":
+                this.error = "Password errata";
+                break;
+            }
+          });
+      }
     },
     resetPassword() {
-      // Il backend invia una mail con un link di reset
-      auth
-        .sendPasswordResetEmail(this.resetEmail)
-        .then(() => {
-          console.log("Emit");
-          // Mostro uno snackbar con un messaggio
-          bus.$emit("snackbarResetPass", {
-            message:
-              "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato",
-            color: ""
+      if (this.$refs.form.validate()) {
+        // Il backend invia una mail con un link di reset
+        auth
+          .sendPasswordResetEmail(this.resetEmail)
+          .then(() => {
+            console.log("Emit");
+            // Mostro uno snackbar con un messaggio
+            bus.$emit("snackbarResetPass", {
+              message:
+                "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato",
+              color: ""
+            });
+            this.inputDialog = false;
+            this.$refs.form.reset();
+          })
+          .catch(err => {
+            console.log(err.message);
+            this.error = "Errore: ripeti la richiesta di reset password.";
           });
-          this.inputDialog = false;
-          this.$refs.form.reset();
-        })
-        .catch(err => {
-          console.log(err.message);
-          this.error = "Errore: ripeti la richiesta di reset password.";
-        });
+      } else {
+        console.log("Ciao");
+      }
     }
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      title: {title1: "Corso di programmazione web", title2: "Sviluppo web"},
+      title: { title1: "Corso di programmazione web", title2: "Sviluppo web" },
       toHome: false,
       exit: false
     });
@@ -188,3 +195,11 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.bg {
+  background: url("https://www.robotlab.com/hs-fs/hubfs/Code-on-Computer-Hero.gif?width=1200&name=Code-on-Computer-Hero.gif")
+    no-repeat center center;
+  background-size: cover;
+}
+</style>

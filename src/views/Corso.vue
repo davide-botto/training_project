@@ -35,11 +35,10 @@
       </v-row>
 
       <!-- Creo una card per ogni document della raccolta "modules" e visualizzo il programma -->
-        <v-card v-for="unit in units" :key="unit.id">
-          <v-card-title>{{unit.title}}</v-card-title>
-          <v-card-text>{{unit.description}}</v-card-text>
-        </v-card>
-      
+      <v-card v-for="unit in units" :key="unit.id">
+        <v-card-title>{{unit.title}}</v-card-title>
+        <v-card-text>{{unit.description}}</v-card-text>
+      </v-card>
     </v-container>
   </div>
 </template>
@@ -57,26 +56,24 @@ export default {
   },
   created() {
     this.$store.dispatch("topbar/act_setBar", {
-      title: { title1: "Pagina del corso", title2: this.title1 },
+      title: { title1: "Pagina del corso", title2: "Corso" },
       toHome: true,
       exit: true
     });
 
     db.collection("students").onSnapshot(res => {
       const changes = res.docChanges();
-      changes.forEach(
-        change => {
-          if (change.type === "added") {
-            //Ricavo i dati dal document e inserisco l'oggetto nell'array "students"
-            this.students.push({
-              ...change.doc.data(),
-              id: change.doc.id
-            });
-          }
-        },
-        err => console.log(err.message)
-      );
-    });
+      changes.forEach(change => {
+        if (change.type === "added") {
+          //Ricavo i dati dal document e inserisco l'oggetto nell'array "students"
+          this.students.push({
+            ...change.doc.data(),
+            id: change.doc.id
+          });
+        }
+      });
+      
+    },err => console.log(err.message));
 
     db.collection("modules").onSnapshot(
       res => {
