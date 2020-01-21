@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import {authentication} from "./authentication"
 import {topbar} from "./topbar"
 import {validateFormRules} from "./validateFormRules"
+
 Vue.use(Vuex);
 
 

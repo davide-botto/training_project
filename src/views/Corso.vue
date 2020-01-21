@@ -50,6 +50,8 @@ import { db } from "@/fb";
 export default {
   data() {
     return {
+      // Nome della raccolta su Firestore
+      courseCollection: "units",
       students: [],
       units: []
     };
@@ -61,21 +63,37 @@ export default {
       exit: true
     });
 
-    db.collection("students").onSnapshot(res => {
+    db.collection("students").onSnapshot(
+      res => {
+        const changes = res.docChanges();
+        changes.forEach(change => {
+          if (change.type === "added") {
+            //Ricavo i dati dal document e inserisco l'oggetto nell'array "students"
+            this.students.push({
+              ...change.doc.data(),
+              id: change.doc.id
+            });
+          }
+        });
+      },
+      err => console.log(err.message)
+    );
+
+    // Carico le unità del corso da Firestore
+    db.collection(this.courseCollection).onSnapshot(res => {
       const changes = res.docChanges();
       changes.forEach(change => {
-        if (change.type === "added") {
-          //Ricavo i dati dal document e inserisco l'oggetto nell'array "students"
-          this.students.push({
-            ...change.doc.data(),
-            id: change.doc.id
-          });
+        let item = this.units.find(el => el.id == change.doc.id);
+        if (change.type == "added") {
+          console.log(change.doc.data());
+          this.units = change.doc.data().moduli;
+        } else if (change.type == "removed") {
+          this.units.splice(this.units.indexOf(item, 0), 1);
         }
+        // AGGIUNGI IL CASO "MODIFIED"
       });
-      
-    },err => console.log(err.message));
-
-    db.collection("modules").onSnapshot(
+    });
+    /*db.collection(this.courseCollection).onSnapshot(
       res => {
         const changes = res.docChanges();
         changes.forEach(change => {
@@ -88,7 +106,7 @@ export default {
         });
       },
       err => console.log(err.message)
-    );
+    );*/
   },
 
   components: {

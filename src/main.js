@@ -8,6 +8,7 @@ import vuetify from './plugins/vuetify';
 import { db } from './fb';
 
 
+
 export const bus = new Vue();
 
 Vue.config.productionTip = false
@@ -16,7 +17,7 @@ auth.languageCode = 'it';
 
 
 auth.onAuthStateChanged(user => {
-
+  
   // Dispatch dell'action initialize per mostrare la schermata di login
   store.dispatch("authentication/act_initialize", user);
   if (user) {
@@ -32,6 +33,9 @@ auth.onAuthStateChanged(user => {
         docRef.get().then(doc => {
           store.dispatch("authentication/act_SET_ENROLLED", doc.exists);
         }).catch(err => console.log(err.message));
+        
+        console.log(store.getters['currentRoute/route'].routeName)
+        console.log(store.getters['authentication/user'].loggedIn)
         
         // I profili normal user e admin hanno due home differenti
         if (user.admin) {
