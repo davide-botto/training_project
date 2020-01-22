@@ -63,6 +63,7 @@ export default {
       exit: true
     });
 
+
     db.collection("students").onSnapshot(
       res => {
         const changes = res.docChanges();

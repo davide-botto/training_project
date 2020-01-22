@@ -8,6 +8,7 @@ import Studenti from '../views/Studenti.vue'
 import profiloStudente from '../views/profiloStudente.vue'
 import Corso from '../views/Corso.vue'
 import courseProgram from '../views/courseProgram.vue'
+import Materials from '../views/Materials.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import HandleEmailPassword from '../views/HandleEmailPassword.vue'
 
@@ -67,6 +68,14 @@ const routes = [
     path: '/courseProgram',
     name: 'courseProgram',
     component: courseProgram,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/materials',
+    name: 'materials',
+    component: Materials,
     meta: {
       requiresAuth: true
     }

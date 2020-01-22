@@ -68,6 +68,11 @@
           <h3>Programma del corso</h3>
           </v-btn>
         </v-col>
+        <v-col cols="6" md="3">
+          <v-btn block style="text-transform: none" to="/materials" height="100">
+          <h3>Materiali</h3>
+          </v-btn>
+        </v-col>
       </v-row>
     </v-container>
 

@@ -11,7 +11,7 @@ import { db } from './fb';
 
 export const bus = new Vue();
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 auth.languageCode = 'it';
 
 
@@ -34,9 +34,7 @@ auth.onAuthStateChanged(user => {
           store.dispatch("authentication/act_SET_ENROLLED", doc.exists);
         }).catch(err => console.log(err.message));
         
-        console.log(store.getters['currentRoute/route'].routeName)
-        console.log(store.getters['authentication/user'].loggedIn)
-        
+                
         // I profili normal user e admin hanno due home differenti
         if (user.admin) {
           router.replace({ name: "adminPanel" }).catch(err => console.log(err.message));
@@ -64,5 +62,6 @@ new Vue({
   store,
   vuetify,
   Vue2TouchEvents,
+ 
   render: h => h(App)
 }).$mount('#app')

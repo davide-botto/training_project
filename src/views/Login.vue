@@ -114,6 +114,7 @@ export default {
               console.log(user.user.emailVerified);
               if (user.user.emailVerified) {
                 console.log("Email verificata");
+               
               } else {
                 this.error = "Email non verificata";
                 console.log(this.error);
