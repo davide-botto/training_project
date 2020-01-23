@@ -29,7 +29,12 @@
       <v-row>
         <v-col cols="12">
           <v-card>
-            <v-card-title>Programma</v-card-title>
+            <v-card-title>
+             <h2>Programma</h2>
+             <v-spacer></v-spacer>
+             <router-link v-show="user.isEnrolled" to="/materials">materiale</router-link>
+        </v-card-title>
+            
           </v-card>
         </v-col>
       </v-row>
@@ -37,6 +42,7 @@
       <!-- Creo una card per ogni document della raccolta "modules" e visualizzo il programma -->
       <v-card v-for="unit in units" :key="unit.id">
         <v-card-title>{{unit.title}}</v-card-title>
+         
         <v-card-text>{{unit.description}}</v-card-text>
       </v-card>
     </v-container>
