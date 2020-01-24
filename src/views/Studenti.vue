@@ -14,7 +14,7 @@
           <v-card class="hidden-md-and-up">Nascita</v-card>
         </v-col>
       </v-row>
-      <v-card v-for="student in students" :key="student.id" v-on:click.native="prova">
+      <v-card v-for="student in students" :key="student.id" v-touch:tap="dialogRemoveStudent">
         <v-row>
           <v-col align="center">
             {{student.surname}}
@@ -88,7 +88,7 @@ export default {
         message: "Confermi di voler cancellare lo studente"
       });
     },
-    prova() {
+    dialogRemoveStudent() {
       if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
         this.triggerPopup();
       }

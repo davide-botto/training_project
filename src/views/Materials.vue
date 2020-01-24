@@ -4,7 +4,7 @@
     <v-container v-if="user.isAdmin">
       <v-row>
         <v-col cols="12" md="6">
-          <v-file-input  label="Sfoglia..." outlined v-model="file"></v-file-input>
+          <v-file-input label="Sfoglia..." outlined v-model="file"></v-file-input>
         </v-col>
         <v-col cols="4" md="4">
           <v-btn @click="upload" outlined color="blue">Carica</v-btn>
@@ -17,15 +17,31 @@
         <thead>
           <tr>
             <th>File</th>
+            <th>Data upload</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in uploadedFiles" :key="item.name">
-            <td @click="downloadFile(item.name)">
-              <a :href="item.link">{{item.name.split("-")[1]}}</a>
+          
+            <tr v-for="(item, index) in uploadedFiles" :key="item.name">
               
-            </td>
-          </tr>
+              <td>
+                <a :href="item.link">{{item.name.split("-")[1]}}</a>
+              </td>
+              <td>
+                {{item.uploadDate}}
+                <span v-show="user.loggedIn && user.isAdmin">
+                  <v-btn
+                    class="px-1 grey lighten-2 hidden-sm-and-down"
+                    min-width="0"
+                    max-width="15px"
+                    max-height="15px"
+                    @click="removeFile(item.name, index)"
+                  >x</v-btn>
+                </span>
+              </td>
+             
+            </tr>
+          
         </tbody>
       </template>
     </v-simple-table>
@@ -62,9 +78,17 @@ export default {
         res.prefixes.forEach(folderRef => console.log(folderRef));
         res.items.forEach(itemRef => {
           itemRef.getDownloadURL().then(urlRef => {
-            // Get file name from string
+            // ******** Ricavo il nome del file e la data di upload dalla stringa ************ //
+            let uploadDate = itemRef.name.split("-")[0];
+            uploadDate = this.formatDate(
+              new Date(+uploadDate).toISOString().substr(0, 10)
+            );
 
-            this.uploadedFiles.push({ name: itemRef.name, link: urlRef });
+            this.uploadedFiles.push({
+              name: itemRef.name,
+              link: urlRef,
+              uploadDate: uploadDate
+            });
           });
         });
       })
@@ -72,15 +96,23 @@ export default {
   },
 
   methods: {
+    formatDate(date) {
+      if (!date) return null;
+      const [year, month, day] = date.split("-");
+      return `${day}-${month}-${year}`;
+    },
+
     // Upload del file selezionato su storage
     upload() {
+      let dataUpload;
       if (this.file) {
         // Se il file esiste, creo un riferimento
-        let timestamp = Number(new Date());
+        dataUpload = new Date();
+        let timestamp = Number(dataUpload);
         let storageRef = storage.ref();
 
         let fileRef = storageRef.child(
-          "materiale/" + timestamp.toString()  + "-" + this.file.name 
+          "materiale/" + timestamp.toString() + "-" + this.file.name
         );
 
         // Carico il file
@@ -124,28 +156,60 @@ export default {
             // Se l'upload è completato correttamente, ottengo l'url per il download
             uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
               console.log("File available at", downloadURL);
-              this.file = null;
-              
 
+              dataUpload = dataUpload.toISOString().substr(0, 10);
+              this.uploadedFiles.push({
+                name: timestamp.toString() + "-" + this.file.name,
+                link: downloadURL,
+                uploadDate: this.formatDate(dataUpload)
               });
+              this.file = null;
             });
-          
-        
+          }
+        );
       } else {
         alert("Non hai selezionato un file da caricare.");
       }
     },
-    
+
+    // *********** Chiamo il metodo "removeFile" su dispositivi mobili *********** //
+    /** Se il breakpoint è sm o xs, chiamo il metodo removeFile */
+    removeForMobile(filename, index) {
+      if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
+        this.removeFile(filename, index);
+      }
+    },
+    removeFile(filename, index) {
+      console.log(filename);
+      // ********* Creo un riferimento al file che voglio cancellare *********** //
+      let deletingFileRef = storage.ref().child("materiale/" + filename);
+      // ********* Cancello il file su storage *********** //
+      deletingFileRef
+        .delete()
+        .then(() => {
+          console.log("File deleted on storage");
+          // ********** Cancello il riferimento sull'array "uploadedFiles" *********** //
+          this.uploadedFiles.splice(index, 1);
+        })
+        .catch(err => console.log(err.message));
+    }
   },
   computed: {
     ...mapGetters({
       user: "authentication/user",
       barprop: "topbar/barprop"
-    }),
-    
+    })
   },
   components: {
     TopBar
   }
 };
 </script>
+
+<style scoped>
+#remove-file {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+}
+</style>
