@@ -103,21 +103,22 @@ export default {
   },
   methods: {
     login() {
-      // Invio il form di login solo se sono rispettate le regole di validazione
+      // ******** Invio il form di login solo se sono rispettate le regole di validazione ********* //
       if (this.$refs.form.validate()) {
-        console.log("prova");
+        
         this.$store.dispatch("authentication/act_triggerMessage", false);
         auth
           .signInWithEmailAndPassword(this.email, this.password)
           .then(user => {
             if (user) {
-              console.log(user.user.emailVerified);
+              // ******** Dopo il login, controllo se l'email fornita è stata verificata ******** //
               if (user.user.emailVerified) {
                 console.log("Email verificata");
-               
+                
               } else {
                 this.error = "Email non verificata";
-                console.log(this.error);
+                
+                // ******* Se l'email non è verificata, apro il popup per il reinvio ******** //
                 bus.$emit("openResendEmail", {
                   title: "Email non verificata",
                   message:
@@ -127,7 +128,7 @@ export default {
             }
           })
           .catch(err => {
-            // Gestisco gli errori di login
+            // ******* Gestisco gli errori di login ******* //
             let errorCode = err.code;
             switch (errorCode) {
               case "auth/invalid-email":
@@ -150,12 +151,12 @@ export default {
     },
     resetPassword() {
       if (this.$refs.form.validate()) {
-        // Il backend invia una mail con un link di reset
+        // ******** Il backend invia una mail con un link di reset ******** //
         auth
           .sendPasswordResetEmail(this.resetEmail)
           .then(() => {
             console.log("Emit");
-            // Mostro uno snackbar con un messaggio
+            // ******* Mostro uno snackbar con un messaggio ******** //
             bus.$emit("snackbarResetPass", {
               message:
                 "Controlla la tua casella di posta. Abbiamo inviato un link di reset password all'indirizzo specificato",
@@ -168,8 +169,6 @@ export default {
             console.log(err.message);
             this.error = "Errore: ripeti la richiesta di reset password.";
           });
-      } else {
-        console.log("Ciao");
       }
     }
   },
@@ -182,7 +181,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      // map `this.user` to `this.$store.getters.user`
+      // ********* map `this.user` to `this.$store.getters.user` ********* //
       user: "authentication/user",
       barprop: "topbar/barprop",
       rules: "validateFormRules/rules"
@@ -196,7 +195,7 @@ export default {
 };
 </script>
 <style scoped>
-/* Carico un'immagine di sfondo sulla schermata di login */
+/* ********* Carico un'immagine di sfondo sulla schermata di login **********/
 .bg {
   background: url("https://www.robotlab.com/hs-fs/hubfs/Code-on-Computer-Hero.gif?width=1200&name=Code-on-Computer-Hero.gif")
     no-repeat center center;

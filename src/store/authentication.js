@@ -8,6 +8,7 @@ export const authentication = {
             isAdmin: false,
             isEnrolled: false,
             message: false,
+            sessionRoute: null,
             data: null
         }
     },
@@ -22,6 +23,9 @@ export const authentication = {
         },
         mut_SET_ADMIN(state, value) {
             state.user.isAdmin = value;
+        },
+        mut_SET_SESSION_ROUTE(state, value) {
+            state.user.sessionRoute = value;
         },
         mut_SET_ENROLLED(state, value) {
             state.user.isEnrolled = value;
@@ -39,7 +43,9 @@ export const authentication = {
         act_initialize() {
             bus.$emit("authStateChange");
         },
-
+        act_SET_SESSION_ROUTE({ commit }, value) {
+            commit("mut_SET_SESSION_ROUTE", value);
+        },
         act_fetchUser({ commit }, user) {
             commit("mut_SET_LOGGED_IN", user !== null);
             commit("mut_SET_ADMIN", user.admin == true);

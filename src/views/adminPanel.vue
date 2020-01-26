@@ -1,9 +1,9 @@
 <template>
-  <!-- Vista Home del profilo admin -->
+  <!-- ********* Vista Home del profilo admin ********** -->
   <div class="home">
     <TopBar />
     <v-container>
-      <!-- <v-content> -->
+      
       <v-row align="center">
         <v-col cols="12" md="6">
           <v-card class="mx-auto" height="200">
@@ -81,11 +81,11 @@
         </v-col>
       </v-row>
 
-      <!-- ****** Componente dialog con stepper per la modifica del profilo ********* -->
+      <!-- ******* Componente dialog con stepper per la modifica del profilo ********* -->
       <updateProfile :urlProfileImage="urlProfileImage"/>
     </v-container>
 
-    <!-- Dialog di inserimento email utente da rendere admin -->
+    <!-- ******* Dialog di inserimento email utente da rendere admin ******** -->
 
     <v-dialog v-model="inputDialog">
       <v-card>
@@ -137,7 +137,7 @@ export default {
       exit: true
     });
 
-    // ********* Al caricamento della pagina, inizializzo l'immagine avatar *********** //
+    // ********* Al caricamento della pagina, inizializzo l'immagine avatar ********** //
     if (auth.currentUser != null) {
       auth.currentUser.providerData.forEach( profile => {
         this.urlProfileImage = profile.photoURL
@@ -146,11 +146,10 @@ export default {
   },
   methods: {
     newAdmin() {
-      // Chiamo la cloud function
+      // ********* Chiamo la cloud function *********** //
       const addAdminRole = functions.httpsCallable("addAdminRole");
       addAdminRole({ email: this.adminEmail })
-        .then(result => {
-          console.log(result);
+        .then(() => {
           this.inputDialog = false;
           this.$refs.form.reset();
         })
@@ -158,6 +157,7 @@ export default {
           this.error = err.message;
         });
     },
+    // ******** Apro il dialog contenente lo stepper per la modifica del profilo ********* //
     triggerStepper() {
       console.log("Evento open stepper");
       bus.$emit("openUpdateProfile");

@@ -45,6 +45,7 @@ export default {
       auth.signOut().then(() => {
         store.dispatch("authentication/act_resetUser");
         store.dispatch("authentication/act_triggerMessage", true);
+        localStorage.clear();
         this.$router.replace({ name: "login" });
       });
     },

@@ -1,5 +1,5 @@
 <template>
-  <!-- Vista Home del profilo studente -->
+  <!-- ******* Vista Home del profilo studente ********-->
   <div class="home">
     <TopBar />
     <v-bottom-navigation horizontal>
@@ -12,7 +12,7 @@
       </v-btn>
     </v-bottom-navigation>
     
-    <!-- Form di iscrizione -->
+    <!-- ******** Form di iscrizione  ********-->
     <v-row justify="center">
       <v-col cols="12" md="8">
         <v-card>
@@ -31,7 +31,7 @@
               <v-text-field label="Cognome" :value="lastName" readonly></v-text-field>
               <v-menu v-model="dateMenu" min-width="290px" :close-on-content-click="false">
                 <template v-slot:activator="{on}">
-                  <!-- Mostro la data come stringa nel formato italiano, ma la salvo  come oggetto Date-->
+                  <!-- ********** Mostro la data come stringa nel formato italiano, ma la salvo come oggetto Date **********-->
                   <v-text-field
                     label="Data di nascita"
                     v-show="!user.isEnrolled"
@@ -122,7 +122,9 @@ export default {
       const [day, month, year] = date.split("-");
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
-    // Carica su Firebase i dati dal form di iscrizione
+    /**----------------------------------------------------
+     * Carico su Firebase i dati dal form di iscrizione
+    --------------------------------------------------------*/
     enrollStudent() {
       if (this.$refs.form.validate()) {
         db.collection("students")
@@ -135,7 +137,7 @@ export default {
           .then(() => {
             console.log("Student added to db.");
 
-            // Setto a true la proprietà "isEnrolled"
+            // ********* Setto a true la proprietà "isEnrolled" ********** //
             this.$store.dispatch("authentication/act_SET_ENROLLED", true);
           })
           .catch(err => console.log(err.message));

@@ -1,10 +1,10 @@
 <template>
   <v-app>
     <v-content>
-      <div v-show="!isAuthenticatedAndverified">
+      <div v-if="!isAuthenticatedAndverified">
         <Loading />
       </div>
-      <div v-show="isAuthenticatedAndverified">
+      <div v-if="isAuthenticatedAndverified">
         <router-view></router-view>
       </div>
     </v-content>
@@ -27,7 +27,8 @@ export default {
   },
 
   data: () => ({
-    isAuthenticatedAndverified: null
+    isAuthenticatedAndverified: null,
+    currentView: null
   }),
 
   computed: {
@@ -35,13 +36,23 @@ export default {
       user: "authentication/user"
     })
   },
- 
+
   mounted() {
     console.log("App mounted");
     // Carico la loading page finché lo store non si aggiorna
     bus.$on("authStateChange", () => {
       this.isAuthenticatedAndverified = true;
     });
+    //console.log(this.$router.currentRoute)
+  },
+  updated() {
+    if (this.$router.currentRoute.name !== "login") {
+      localStorage.setItem("name", this.$router.currentRoute.name);
+    }
+    this.$store.dispatch(
+      "authentication/act_SET_SESSION_ROUTE",
+      this.$router.currentRoute.name
+    );
   }
 };
 </script>
