@@ -14,8 +14,6 @@ export const bus = new Vue();
 Vue.config.productionTip = false;
 auth.languageCode = 'it';
 
-
-
 auth.onAuthStateChanged(user => {
   
   // Dispatch dell'action initialize per mostrare la schermata di login

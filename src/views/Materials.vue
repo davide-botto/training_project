@@ -15,36 +15,34 @@
     <v-simple-table>
       <template v-slot:default>
         <thead>
-          <tr>
+          <tr @dblclick="showRemove" v-longpress="showRemove">
             <th>File</th>
-            <th>Data upload</th>
+            <th class="hidden-sm-and-down">Data upload</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          
-            <tr v-for="(item, index) in uploadedFiles" :key="item.name">
-              
-              <td>
-                <a :href="item.link">{{item.name.split("-")[1]}}</a>
-              </td>
-              <td>
-                {{item.uploadDate}}
-                <span v-show="user.loggedIn && user.isAdmin">
-                  <v-btn
-                    class="px-1 grey lighten-2 hidden-sm-and-down"
-                    min-width="0"
-                    max-width="15px"
-                    max-height="15px"
-                    @click="removeFile(item.name, index)"
-                  >x</v-btn>
-                </span>
-              </td>
-             
-            </tr>
-          
+          <tr v-for="(item, index) in uploadedFiles" :key="item.name">
+            <td>
+              <a :href="item.link">{{item.name.split("-")[1]}}</a>
+            </td>
+
+            <td class="hidden-sm-and-down">{{item.uploadDate}}</td>
+
+            <td>
+              <v-btn
+                text
+                v-show="user.loggedIn && user.isAdmin && remove"
+                @click="removeFile(item.name, index)"
+              >
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </td>
+          </tr>
         </tbody>
       </template>
     </v-simple-table>
+    <fileDialog />
   </div>
 </template>
     
@@ -52,17 +50,92 @@
 <script>
 import { mapGetters } from "vuex";
 import TopBar from "../components/TopBar";
-
+import fileDialog from "../components/fileDialog";
+import { bus } from "@/main";
 import { storage } from "@/fb";
 import { storageProp } from "@/fb";
+
 export default {
   data() {
     return {
       file: null,
       downloadlink: null,
-      uploadedFiles: []
+      uploadedFiles: [],
+      remove: false
     };
   },
+  directives: {
+    /**-------------------------------------------------------
+     * ************** Direttiva "longpress" ******************
+     * Fa comparire i pulsanti di eliminazione su smartphone 
+    ----------------------------------------------------------*/
+    longpress: {
+      bind: function(el, binding, vNode) {
+        /**
+         * el: elemento a cui è agganciata la direttiva
+         * binding: oggetto con proprietà direttiva
+         * vNode: virtual node di Vue
+         */
+        // *********** Verifico che l'espressione fornita sia una funzione *********** //
+        if (typeof binding.value !== "function") {
+          // -------- Fetch name of component --------- //
+          const compName = vNode.context.name;
+          // ------- pass warning to console --------- //
+          let warn = `[longpress:] provided expression '${binding.expression}' is not a function, but has to be`;
+          if (compName) {
+            warn += `Found in component '${compName}' `;
+          }
+
+          console.warn(warn);
+        }
+
+        // ******* Definisco la variabile timer ******** //
+        let pressTimer = null;
+
+        // ******* Definisco le funzioni handler ******** //
+
+        // ---- Start ----- //
+        let start = e => {
+          // ------ Scarto gli eventi click --------- //
+          if (e.type === "click" && e.button !== 0) {
+            return;
+          }
+
+          if (pressTimer === null) {
+            pressTimer = setTimeout(() => {
+              // -------- Chiamo la funzione con il timeout --------- //
+              handler();
+            }, 1000);
+          }
+        };
+
+        // --------- Cancello il timeout -------------//
+        let cancel = () => {
+          // Check if timer has a value or not
+          if (pressTimer !== null) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+        };
+
+        // -------- Eseguo il metodo legato alla directive ---------- //
+        const handler = (e) => {
+          // --------- In questo caso il valore passato alla direttiva è un metodo ----------- //
+          binding.value(e); 
+        };
+
+        // ---------- Add Event listeners ------------- //
+        el.addEventListener("mousedown", start);
+        el.addEventListener("touchstart", start);
+        // -------- Cancel timeouts if this events happen --------- //
+        el.addEventListener("click", cancel);
+        el.addEventListener("mouseout", cancel);
+        el.addEventListener("touchend", cancel);
+        el.addEventListener("touchcancel", cancel);
+      }
+    }
+  },
+
   created() {
     this.$store.dispatch("topbar/act_setBar", {
       title: { title1: "Materiali", title2: "Materiali" },
@@ -101,7 +174,9 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}-${month}-${year}`;
     },
-
+    showRemove() {
+      this.remove = !this.remove;
+    },
     // Upload del file selezionato su storage
     upload() {
       let dataUpload;
@@ -174,9 +249,12 @@ export default {
 
     // *********** Chiamo il metodo "removeFile" su dispositivi mobili *********** //
     /** Se il breakpoint è sm o xs, chiamo il metodo removeFile */
-    removeForMobile(filename, index) {
+    triggerPopup(item) {
       if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
-        this.removeFile(filename, index);
+        bus.$emit("openFileDialog", {
+          name: item.name.split("-")[1],
+          date: item.uploadDate
+        });
       }
     },
     removeFile(filename, index) {
@@ -201,15 +279,9 @@ export default {
     })
   },
   components: {
-    TopBar
+    TopBar,
+    fileDialog
   }
 };
 </script>
 
-<style scoped>
-#remove-file {
-  position: absolute;
-  top: 4px;
-  right: 2px;
-}
-</style>

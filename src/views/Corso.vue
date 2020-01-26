@@ -99,7 +99,7 @@ export default {
         }
         // AGGIUNGI IL CASO "MODIFIED"
       });
-    });
+    }, err => console.log(err.message));
     /*db.collection(this.courseCollection).onSnapshot(
       res => {
         const changes = res.docChanges();
