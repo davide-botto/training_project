@@ -43,10 +43,16 @@
                       <v-col cols="6">
                         <SignUp />
                       </v-col>
+
+                      <!-- ******* Button per l'accesso con account (Google, altri da implementare) ******** -->
+                      <v-col cols="12" align="center">
+                        <v-btn router to="/signInWithAccounts">Accedi con account</v-btn>
+                      </v-col>
                       <v-col cols="12">
                         <v-btn block @click="inputDialog = true">Hai dimenticato la password?</v-btn>
                       </v-col>
                     </v-row>
+                    <v-row></v-row>
                   </v-container>
                 </v-card-actions>
               </v-card>
@@ -56,7 +62,7 @@
       </v-container>
     </v-content>
 
-    <!-- Form di reset password -->
+    <!-- ******* Form di reset password ********* -->
     <v-dialog v-model="inputDialog" max-width="400px">
       <v-card class="d-flex justify center">
         <v-card-title>
@@ -80,7 +86,6 @@
     </v-dialog>
     <resendEmail />
   </v-app>
-  <!-- </div> -->
 </template>
 
 <script>
@@ -98,14 +103,15 @@ export default {
       resetEmail: "",
       password: "",
       error: null,
-      inputDialog: false
+      inputDialog: false,
+      passwordDialog: false,
+      provider: null
     };
   },
   methods: {
     login() {
       // ******** Invio il form di login solo se sono rispettate le regole di validazione ********* //
       if (this.$refs.form.validate()) {
-        
         this.$store.dispatch("authentication/act_triggerMessage", false);
         auth
           .signInWithEmailAndPassword(this.email, this.password)
@@ -114,10 +120,9 @@ export default {
               // ******** Dopo il login, controllo se l'email fornita è stata verificata ******** //
               if (user.user.emailVerified) {
                 console.log("Email verificata");
-                
               } else {
                 this.error = "Email non verificata";
-                
+
                 // ******* Se l'email non è verificata, apro il popup per il reinvio ******** //
                 bus.$emit("openResendEmail", {
                   title: "Email non verificata",

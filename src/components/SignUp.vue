@@ -83,7 +83,6 @@ export default {
       error: null
     };
   },
-
   methods: {
     signUp() {
       if (this.$refs.form.validate()) {
@@ -99,11 +98,9 @@ export default {
           this.$refs.form.reset();
           this.error = null;
         });
-
         // Invio link di verifica email
         promise.then(() => {
           let user = auth.currentUser;
-
           user.sendEmailVerification().then(() => {
             console.log("Email verification");
             bus.$emit("snackbarVerify", {
@@ -127,6 +124,3 @@ export default {
   }
 };
 </script>
-
-
-

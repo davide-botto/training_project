@@ -4,6 +4,7 @@ import 'firebase/storage'
 import 'firebase/auth'
 import 'firebase/firebase-functions'
 
+
 // Your web app's Firebase configuration
 var firebaseConfig = {
     apiKey: "AIzaSyDThevYSG9Ekz-4ADxbxerDJlijLbPsGHw",
@@ -16,8 +17,10 @@ var firebaseConfig = {
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+  export const providers = [new firebase.auth.GoogleAuthProvider(), new firebase.auth.FacebookAuthProvider()];
   export const db = firebase.firestore();
   export const auth = firebase.auth();
+  export const authProp = firebase.auth;
   export const functions = firebase.functions();
   export const storage = firebase.storage();
   export const storageProp = firebase.storage;

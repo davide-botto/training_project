@@ -11,6 +11,7 @@ import courseProgram from '../views/courseProgram.vue'
 import Materials from '../views/Materials.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import HandleEmailPassword from '../views/HandleEmailPassword.vue'
+import signInWithAccounts from '../views/signInWithAccounts.vue'
 
 Vue.use(VueRouter)
 
@@ -19,6 +20,11 @@ const routes = [
     path: '/',
     name: 'login',
     component: Login
+  },
+  {
+    path: '/signInWithAccounts',
+    name: 'signInWithAccounts',
+    component: signInWithAccounts
   },
 
   {

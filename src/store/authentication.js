@@ -1,10 +1,11 @@
-// Gestisce le proprietà della sessione utente 
+// ******** Gestisce le proprietà della sessione utente ********** //
 import { bus } from "@/main";
 export const authentication = {
     namespaced: true,
     state: {
         user: {
             loggedIn: false,
+            signInMethod: "",
             isAdmin: false,
             isEnrolled: false,
             message: false,
@@ -19,7 +20,13 @@ export const authentication = {
     },
     mutations: {
         mut_SET_LOGGED_IN(state, value) {
+
             state.user.loggedIn = value;
+        },
+
+        mut_prova(state, value) {
+            console.log("Fiiiiiii")
+            state.user.signInMethod = value;
         },
         mut_SET_ADMIN(state, value) {
             state.user.isAdmin = value;
@@ -39,11 +46,15 @@ export const authentication = {
         }
     },
     actions: {
-        // Emetto l'evento "authStateChanged" al caricamento dell'app
+        // ******** Emetto l'evento "authStateChanged" al caricamento dell'app ********* //
         act_initialize() {
             bus.$emit("authStateChange");
         },
+        act_SET_SIGN_IN_METHOD({ commit }, value) {
+            commit("mut_prova", value);
+        },
         act_SET_SESSION_ROUTE({ commit }, value) {
+
             commit("mut_SET_SESSION_ROUTE", value);
         },
         act_fetchUser({ commit }, user) {
@@ -80,7 +91,7 @@ export const authentication = {
     }
 }
 
-// Gestisce le proprietà della barra in alto presente in tutte le pagine
+// ********* Gestisce le proprietà della barra in alto presente in tutte le pagine *********** //
 export const topbar = {
     namespaced: true,
     state: {

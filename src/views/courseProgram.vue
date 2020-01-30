@@ -91,7 +91,6 @@ export default {
       const changes = res.docChanges();
       changes.forEach(change => {
         if (change.type == "added") {
-          console.log(change.doc.data());
           this.units = change.doc.data().moduli;
         }
       });

@@ -5,7 +5,7 @@
       <v-card-title>Modifica profilo</v-card-title>
       <v-stepper v-model="progress">
         <!-- ********** PRIMO STEP: nome visualizzato *********** -->
-        <v-stepper-step editable :comlete="progress >1" step="1">Modifica nome</v-stepper-step>
+        <v-stepper-step editable :complete="progress >1" step="1">Modifica nome</v-stepper-step>
         <v-stepper-content step="1">
           <v-form>
             <v-text-field v-model="user.data.displayName"></v-text-field>
@@ -21,7 +21,7 @@
             <v-row>
               <v-col cols="4" md="2" align="center">
                 <v-avatar size="90">
-                  <img :src="urlProfileImage" alt="Profilo" />
+                  <img :src="source" alt="Profilo" />
                 </v-avatar>
               </v-col>
               <v-col cols="6" md="5">
@@ -42,7 +42,7 @@
           <v-row>
             <v-col cols="4" md="2" align="center">
               <v-avatar size="90">
-                <img :src="urlProfileImage" alt="Profilo" />
+                <img :src="source" alt="Profilo" />
               </v-avatar>
             </v-col>
             <v-col cols="6" md="5">
@@ -63,29 +63,40 @@
 import { bus } from "@/main";
 import { mapGetters } from "vuex";
 import { auth, db, storage, storageProp } from "@/fb";
+//import { downloadImage } from "@/downloadImage";
 
 export default {
-  props: ['urlProfileImage'],
+  //props: ["urlProfileImage"],
   data() {
     return {
       editProfile: false,
       progress: 1,
       imageFile: null,
+      source: null,
       
     };
   },
   created() {
-    bus.$on("openUpdateProfile", () => {
+    bus.$on("openUpdateProfile", (payload) => {
       console.log("Evento open stepper ricevuto");
       this.editProfile = true;
+      this.source = payload.base64String;
     });
+    
+    /** Al caricamento del componente, inizializzo l'immagine avatar 
+     * In questo modo non devo passare l'url dell'immagine come prop */
 
-    // ********* Al caricamento della pagina, inizializzo l'immagine avatar *********** //
-    if (auth.currentUser != null) {
+    /*if (auth.currentUser != null) {
       auth.currentUser.providerData.forEach(profile => {
-        this.urlProfileImage = profile.photoURL;
+        const setSource = (payload) => {
+          this.source = payload;
+        }
+
+
+        downloadImage(profile.photoURL, setSource);
+        
       });
-    }
+    }*/
   },
   methods: {
     //------------------------------------------------------------//
@@ -93,12 +104,12 @@ export default {
      * compare uno stepper che gestisce i passaggi di modifica:
      * 1 - modifica nome
      * 2 - modifica immagine di profilo
-     * 3 - modifica email dell'account
+     * 3 - riepilogo
      */
 
-//--------------------------------------------------------------------//
-    // ************ Caricamento immagine di profilo **************** //
-//-------------------------------------------------------------------//
+    //--------------------------------------------------------------------//
+    // ************** Caricamento immagine di profilo **************** //
+    //-------------------------------------------------------------------//
     uploadImage() {
       // ******** Per prima cosa controllo se è stato caricato un file *********** //
       if (this.imageFile) {
@@ -106,12 +117,8 @@ export default {
         if (this.imageFile.name) {
           let storageRef = storage
             .ref()
-            .child(
-              "profilePhotos/" +
-                auth.currentUser.uid +
-                "-" +
-                this.imageFile.name
-            );
+            .child("profilePhotos/" + auth.currentUser.uid + "/")
+            .child(this.imageFile.name);
 
           console.log(storageRef);
           // ********** Carico il file su storage ************** //
@@ -134,7 +141,7 @@ export default {
                   break;
               }
             },
-            // ******** Gestione casi di errore ************ //
+            // ********* Gestione casi di errore ************ //
             function(error) {
               switch (error.code) {
                 case "storage/unauthorized":
@@ -194,11 +201,11 @@ export default {
               })
               .then(() => {
                 console.log("Student updated to db.");
-                this.editProfile = false
+                this.editProfile = false;
               })
               .catch(err => console.log(err.message));
           } else {
-            this.editProfile = false
+            this.editProfile = false;
           }
         })
 
@@ -210,7 +217,8 @@ export default {
   computed: {
     ...mapGetters({
       user: "authentication/user"
-    })
+    }),
+    
   }
 };
 </script>

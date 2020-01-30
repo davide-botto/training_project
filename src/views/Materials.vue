@@ -24,7 +24,7 @@
         <tbody>
           <tr v-for="(item, index) in uploadedFiles" :key="item.name">
             <td>
-              <a :href="item.link">{{item.name.split("-")[1]}}</a>
+              <a  @click="downloadFile(item)">{{item.name.split("-")[1]}}</a>
             </td>
 
             <td class="hidden-sm-and-down">{{item.uploadDate}}</td>
@@ -43,6 +43,7 @@
       </template>
     </v-simple-table>
     <fileDialog />
+    <!-- <v-btn @click="download">Prova download</v-btn> -->
   </div>
 </template>
     
@@ -54,6 +55,8 @@ import fileDialog from "../components/fileDialog";
 import { bus } from "@/main";
 import { storage } from "@/fb";
 import { storageProp } from "@/fb";
+import {downloadPDF} from "@/download"
+//var FileSaver = require('file-saver');
 
 export default {
   data() {
@@ -119,9 +122,9 @@ export default {
         };
 
         // -------- Eseguo il metodo legato alla directive ---------- //
-        const handler = (e) => {
+        const handler = e => {
           // --------- In questo caso il valore passato alla direttiva è un metodo ----------- //
-          binding.value(e); 
+          binding.value(e);
         };
 
         // ---------- Add Event listeners ------------- //
@@ -137,6 +140,8 @@ export default {
   },
 
   created() {
+    //document.getElementById("0").click();
+
     this.$store.dispatch("topbar/act_setBar", {
       title: { title1: "Materiali", title2: "Materiali" },
       toHome: true,
@@ -151,6 +156,7 @@ export default {
         res.prefixes.forEach(folderRef => console.log(folderRef));
         res.items.forEach(itemRef => {
           itemRef.getDownloadURL().then(urlRef => {
+            
             // ******** Ricavo il nome del file e la data di upload dalla stringa ************ //
             let uploadDate = itemRef.name.split("-")[0];
             uploadDate = this.formatDate(
@@ -169,6 +175,11 @@ export default {
   },
 
   methods: {
+    downloadFile(item) {
+      console.log("Download");
+      downloadPDF(item.link)
+    },
+    
     formatDate(date) {
       if (!date) return null;
       const [year, month, day] = date.split("-");

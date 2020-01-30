@@ -46,7 +46,7 @@ export default {
     //console.log(this.$router.currentRoute)
   },
   updated() {
-    if (this.$router.currentRoute.name !== "login") {
+    if (this.$router.currentRoute.name !== "login" && this.$router.currentRoute.name !== "signInWithAccounts") {
       localStorage.setItem("name", this.$router.currentRoute.name);
     }
     this.$store.dispatch(
