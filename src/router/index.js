@@ -32,7 +32,7 @@ const routes = [
     name: 'home',
     component: Home,
     meta: {
-      requiresAuth: true
+       requiresAuth: true
     }
   },
   {
@@ -121,11 +121,16 @@ router.beforeEach((to, from, next) => {
     if (store.getters['authentication/user'].loggedIn && store.getters['authentication/user'].data.emailVerified) {
       next()
 
-    } else {
+    } else if (store.getters['authentication/user'].loggedIn && store.getters['authentication/user'].signInMethod === 'account') {
+      
+      next()
+    }
+    else {
       next('/')
     }
     // Alcune routes devono essere accessibili solo agli utenti admin
   } else if (to.matched.some(record => record.meta.requiresAdmin)){
+    
     if (store.getters['authentication/user'].loggedIn && store.getters['authentication/user'].isAdmin) {
       next()
     } else {

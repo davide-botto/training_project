@@ -45,12 +45,13 @@ auth.onAuthStateChanged(user => {
 
 
     } else {
-      console.log(user.loggedIn)
+      
       if(user.providerData[0].providerId === 'facebook.com'){
         console.log("Vai a home")
         store.dispatch("authentication/act_fetchUser", user);
-        
-        router.replace({ name: "home" },() => {});
+        store.dispatch("authentication/act_SET_SIGN_IN_METHOD", "account");
+        console.log(store.getters["authentication/user"].signInMethod);
+        router.replace({ name: "home" }).catch(err => console.log(err));
       }
     }
   }

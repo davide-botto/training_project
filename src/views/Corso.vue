@@ -33,7 +33,7 @@
             <v-card-title>
               <h2>Programma</h2>
               <v-spacer></v-spacer>
-              <router-link v-show="user.isEnrolled" to="/materials">materiale</router-link>
+              <router-link v-if="user.isEnrolled" to="/materials">materiale</router-link>
             </v-card-title>
           </v-card>
         </v-col>
