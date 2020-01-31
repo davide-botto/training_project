@@ -12,6 +12,7 @@ import Materials from '../views/Materials.vue'
 import ChangePassword from '../views/ChangePassword.vue'
 import HandleEmailPassword from '../views/HandleEmailPassword.vue'
 import signInWithAccounts from '../views/signInWithAccounts.vue'
+import testCertificate from '../views/testCertificate.vue'
 
 Vue.use(VueRouter)
 
@@ -84,6 +85,15 @@ const routes = [
     component: Materials,
     meta: {
       requiresAuth: true
+    }
+  },
+  {
+    path: '/testCertificate',
+    name: 'testCertificate',
+    component: testCertificate,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true
     }
   },
   {

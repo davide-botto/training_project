@@ -12,6 +12,7 @@
     "file-saver": "^2.0.2",
     "firebase": "^7.6.1",
     "firebaseui": "^4.4.0",
+    "jspdf": "^1.5.3",
     "vee-validate": "^3.2.1",
     "vue": "^2.6.11",
     "vue-navigation": "^1.1.4",

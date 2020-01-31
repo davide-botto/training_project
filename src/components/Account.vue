@@ -8,25 +8,12 @@
       </template>
       <v-list>
         <!-- <v-list-item @click.stop="outputDialog=true">Account</v-list-item> -->
-        <v-list-item @click="toChangePassword">Cambio password</v-list-item>
-
+        <v-list-item v-if="user.signInMethod!=='account'" @click="toChangePassword">Cambio password</v-list-item>
         <v-list-item @click="logout">Esci</v-list-item>
       </v-list>
     </v-menu>
 
-    <!-- Dialog con informazioni account -->
-    <v-dialog v-model="outputDialog" max-width="450px">
-      <v-card v-show="user.loggedIn">
-        <v-card-title>
-          <h3>Informazioni account</h3>
-          <v-card-text v-if="user.loggedIn">
-            Utente logged in come {{user.data.email}}
-            <div v-show="user.loggedIn && user.isAdmin" align="center">Admin</div>
-          </v-card-text>
-        </v-card-title>
-      </v-card>
-    </v-dialog>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -37,7 +24,7 @@ import store from "../store/";
 export default {
   data() {
     return {
-      outputDialog: false
+      
     };
   },
   methods: {

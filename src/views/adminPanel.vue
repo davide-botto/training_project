@@ -78,6 +78,11 @@
             <h3>Materiali</h3>
           </v-btn>
         </v-col>
+        <v-col cols="6" md="3">
+          <v-btn block style="text-transform: none" to="/testCertificate" height="100">
+            <h3>Certificato</h3>
+          </v-btn>
+        </v-col>
       </v-row>
 
       <!-- ******* Componente dialog con stepper per la modifica del profilo ********* -->

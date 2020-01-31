@@ -2,8 +2,18 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
 
+exports.checkUser = functions.region('europe-west2').auth.user().onCreate((event) => {
+    const user = event.data;
+    var userObject = {
+        displayName: user.displayName,
+        email: user.email,
+        emailVerified: true,
+        metadata: user.metadata
+    }
+    return admin.auth().updateUser(user.uid, userObject);
+});
 exports.addAdminRole = functions.https.onCall((data, context) => {
-    // context contienen informazioni su user al momento in cui effettua la richiesta
+    // context contiene informazioni su user al momento in cui effettua la richiesta
     // Verifico che la richiesta sia effettuata da un ADMIN
     if (context.auth.token.admin !== true) {
         return {error: 'Solo gli amministratori possono creare altri amministratori'}

@@ -24,8 +24,8 @@ export const authentication = {
             state.user.loggedIn = value;
         },
 
-        mut_prova(state, value) {
-            console.log("Fiiiiiii")
+        mut_SET_SIGN_IN(state, value) {
+            
             state.user.signInMethod = value;
         },
         mut_SET_ADMIN(state, value) {
@@ -51,7 +51,7 @@ export const authentication = {
             bus.$emit("authStateChange");
         },
         act_SET_SIGN_IN_METHOD({ commit }, value) {
-            commit("mut_prova", value);
+            commit("mut_SET_SIGN_IN", value);
         },
         act_SET_SESSION_ROUTE({ commit }, value) {
 
