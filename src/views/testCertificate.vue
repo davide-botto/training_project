@@ -32,6 +32,7 @@
       </table>
     </div>
     <v-btn @click="makeCertificate()">Genera certificato</v-btn>
+    <v-btn @click="testPDF()">Genera certificato</v-btn>
   </div>
 </template>
 
@@ -40,6 +41,7 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { formatDate } from "@/formatDate";
+import {generateDocument} from "@/jsPDF";
 export default {
   data() {
     return {
@@ -77,6 +79,9 @@ export default {
         );
         pdf.save("Test.pdf");
       });
+    },
+    testPDF() {
+      generateDocument();
     }
   }
 };
@@ -84,6 +89,9 @@ export default {
 <style scoped>
 td,
 th {
-  border: 1px solid #999;
+  border: 0px solid #999;
+}
+#certificateTable {
+  display: true
 }
 </style>
