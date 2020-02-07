@@ -1,3 +1,4 @@
+// ******* GENERA DOCUMENTO PDF LATO CLIENT CON LIBRERIA pdfmake ******* //
 import pdfMake from "pdfmake/build/pdfmake.js";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import * as head from "@/Header.js";
@@ -5,12 +6,14 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export function generateDocument() {
     var dd = {
+        // ****** FOOTER *********//
         footer: function(/*currentPage, pageCount*/) { return [
             {image: head.footer,
             width: '560',
             height: '80',
             margin: [20,0]
             }] },
+        // ******** HEADER ******** //
           header: function(/*currentPage, pageCount, pageSize*/) {
             // you can apply any logic and return any valid pdfmake element
         
@@ -21,7 +24,8 @@ export function generateDocument() {
         margin: [35,0]
                
             }]},
-              
+        
+        //******** TESTO DEL DOCUMENTO  ********/
         content: [
             {text: 'Il modulo riguarda gli studenti frequentanti il Terzo o Quarto Anno di Corso interessati a svolgere stage estivo in azienda.', margin:[0,70,0,5]},
             
